@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dsig-standard/dsig-signal/v0.5/dsig-signal.json",
+  "title": "D-SIG Signal",
+  "description": "Distilled Signal Standard v0.5 — A vitality signal for distributed systems. Public Domain CC0.",
+  "type": "object",
+  "required": ["dsig_version", "score", "label", "color", "trend", "timestamp", "ttl", "source_id", "perspective"],
+  "properties": {
+    "dsig_version": {
+      "type": "string",
+      "description": "D-SIG specification version used to produce this signal.",
+      "enum": ["0.5"]
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Normalised vitality score. 100 = optimal, 0 = total failure. Computed by implementation-defined weighting profile."
+    },
+    "label": {
+      "type": "string",
+      "enum": ["EXCELLENT", "GOOD", "DEGRADED", "CRITICAL"],
+      "description": "Semantic label. MUST be derived from score only (Rule 10). EXCELLENT=85-100, GOOD=60-84, DEGRADED=35-59, CRITICAL=0-34."
+    },
+    "color": {
+      "type": "string",
+      "enum": ["GREEN", "YELLOW", "ORANGE", "RED"],
+      "description": "Visual code. MUST be consistent with label (GREEN=EXCELLENT, YELLOW=GOOD, ORANGE=DEGRADED, RED=CRITICAL)."
+    },
+    "trend": {
+      "type": "string",
+      "enum": ["STABLE", "IMPROVING", "DEGRADING", "CRITICAL_FALL"],
+      "description": "Temporal derivative of score over the observation window. Independent of label (Rule 10). CRITICAL_FALL overrides score for urgency assessment."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 production timestamp. Used for anti-replay validation and temporal analysis."
+    },
+    "ttl": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 600,
+      "description": "Signal validity in seconds. Recommended max: 600. After expiry, signal is STALE → treated as UNKNOWN / trend CRITICAL_FALL."
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable producer identifier anchored on a persistent cryptographic key (e.g. Ed25519 fingerprint). MUST NOT be an ephemeral network address."
+    },
+    "perspective": {
+      "type": "string",
+      "enum": ["LOCAL", "CENTRAL", "EXTERNAL"],
+      "description": "Producer perspective type. LOCAL=node inside observed network, CENTRAL=hub/aggregator, EXTERNAL=oracle outside the network."
+    },
+    "source_sig": {
+      "type": "string",
+      "description": "Ed25519 signature of the payload (base64). Required when trust_level >= 1. Proves content origin, not just channel identity."
+    },
+    "source_pub": {
+      "type": "string",
+      "description": "Fingerprint or base64 of the producer's Ed25519 public key. Enables signature verification without a central PKI."
+    },
+    "trust_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "Declared trust level. 0=unsigned, 1=Ed25519 signed payload, 2=mTLS organisational CA, 3=delegated D-SIG CA."
+    },
+    "baseline_cycles": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Consecutive convergence cycles with reference perspectives. Producer-declared value is a synchronisation HINT only. Receiver MUST compute independently. A discontinuous jump is treated as Rule 7 (contradictory signal). 0=first emission or recent convergence break."
+    },
+    "dimensions": {
+      "type": "object",
+      "description": "Intermediate scores by dimension. Each entry SHOULD include score, timestamp, and ttl for individual freshness tracking.",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Simple numeric score (backward compatible)."
+          },
+          {
+            "type": "object",
+            "required": ["score"],
+            "properties": {
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Dimension score."
+              },
+              "ts": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp of this dimension's last measurement."
+              },
+              "ttl": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Validity of this dimension's measurement in seconds."
+              },
+              "flags": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Optional flags for this dimension (e.g. STALE, CALIBRATING, UNREACHABLE)."
+              }
+            }
+          }
+        ]
+      }
+    },
+    "flags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Signal-level flags. Examples: CALIBRATING, TERRAIN_STALE, HUB_UNREACHABLE, INTERNET_UNREACHABLE."
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "dsig_version": "0.5",
+      "score": 82,
+      "label": "GOOD",
+      "color": "YELLOW",
+      "trend": "STABLE",
+      "timestamp": "2026-03-09T14:32:00Z",
+      "ttl": 900,
+      "source_id": "fp:a3:7c:12:ed25519",
+      "trust_level": 1,
+      "baseline_cycles": 10,
+      "perspective": "LOCAL",
+      "flags": [],
+      "dimensions": {
+        "vital":      {"score": 1,  "ts": "2026-03-09T14:32:00Z", "ttl": 300},
+        "local":      {"score": 10, "ts": "2026-03-09T14:31:00Z", "ttl": 3600},
+        "internet":   {"score": 25, "ts": "2026-03-09T14:31:00Z", "ttl": 3600},
+        "dns":        {"score": 15, "ts": "2026-03-09T14:31:00Z", "ttl": 3600},
+        "throughput": {"score": 22, "ts": "2026-03-09T08:04:00Z", "ttl": 43200},
+        "hub":        {"score": 10, "ts": "2026-03-09T14:32:00Z", "ttl": 600}
+      }
+    }
+  ]
+}
