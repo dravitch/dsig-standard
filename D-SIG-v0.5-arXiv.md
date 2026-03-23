@@ -219,6 +219,7 @@ coherent convergence and evaporates without renewal (TTL).
 
 **JSON example — D-SIG v0.5 compliant:**
 
+\needspace{28\baselineskip}
 ```json
 {
   "dsig_version": "0.5",
@@ -503,10 +504,15 @@ readability layer above them. Technical depth remains accessible below the signa
 ## 7. Governance — Open Manifesto Model
 
 1. Public GitHub repository, CC0 licence. Commit timestamp = incontestable prior art.
+
 2. Whitepaper submission to arXiv (cs.NI). Timestamped, indexed, permanent.
+
 3. Author retains copyright on the NetPulse reference implementation, independently of the public domain framework.
-4. Any implementation declares D-SIG compatible if it respects the required fields (§3.2), distillation rules (§3.5), receiver requirements (§3.8), and documents its weighting profile.
+
+4. Any implementation declares D-SIG compatible if it respects the required fields (Section 3.2), distillation rules (Section 3.5), receiver requirements (Section 3.8), and documents its weighting profile.
+
 5. No certification authority. Compliance is self-declared and community-verifiable.
+
 6. Community feedback is invited on: weighting profiles for v1.0 sector standards, formalisation of precondition semantics, `baseline_cycles` computation algorithms.
 
 > **Principle.** D-SIG belongs to the public domain. No one can patent it — including
@@ -557,7 +563,7 @@ correctly implemented and one that cannot.
 - Wilder, J.W. (1978). *New Concepts in Technical Trading Systems*. [RSI — conceptual ancestor of `baseline_cycles`]
 - Appel, G. (1979). *The Moving Average Convergence/Divergence Method*. [MACD — conceptual ancestor of `trend` field]
 - IEC 61508 — *Functional Safety of Electrical/Electronic/Programmable Electronic Safety-related Systems*.
-- Forrester Research (2020). *SOC Alert Volume Study*.
+- Forrester Research (2020). *SOC Alert Volume Study* (white paper).
 - IBM / Morning Consult (2023). *SOC Performance and Alert Fatigue Survey*.
 - Trend Micro (2023). *Report on SOC Analyst Alert Fatigue*.
 - ACM Computing Surveys (2024). *Alert Fatigue in Security Operations Centres: Research Challenges and Opportunities*.
