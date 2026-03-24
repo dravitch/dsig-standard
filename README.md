@@ -2,6 +2,8 @@
 
 > *A framework for seeing operational truth — not computing it.*
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19186972.svg)](https://doi.org/10.5281/zenodo.19186972)
+
 D-SIG (Distilled Signal) is an open architectural framework for the distillation of digital vitality signals in distributed systems. It specifies how to produce, transmit, and consume a unified health signal readable by anyone — field technician, manager, or automated system — regardless of the underlying monitoring stack.
 
 ---

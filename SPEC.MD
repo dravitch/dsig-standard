@@ -187,6 +187,8 @@ D-SIG applies the composite indicator architecture of algorithmic trading to IT 
 
 - **Licence:** CC0 — Public Domain. No restrictions. No certification authority.
 - **Prior art:** GitHub commit timestamp + arXiv cs.NI submission
+- **DOI permanent :** [10.5281/zenodo.19186972](https://doi.org/10.5281/zenodo.19186972)
+  — Zenodo record, timestamped 2026-03-23, citable as prior art
 - **Reference implementation:** NetPulse — copyright author, separate from this standard
 - **Compatibility:** implement required fields + document your weighting profile = D-SIG compatible
 

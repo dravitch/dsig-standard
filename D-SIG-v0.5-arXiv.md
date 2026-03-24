@@ -8,7 +8,7 @@ license: "CC0 1.0 Universal"
 arxiv:
   subject: "cs.NI"
   secondary: "cs.DC"
-  comments: "27 pages, JSON schema in appendix. Reference implementation: NetPulse (github.com/dsig-standard). Public domain CC0."
+  comments: "27 pages, JSON schema in appendix. Reference implementation: NetPulse (github.com/dsig-standard). Zenodo: 10.5281/zenodo.19186972. Public domain CC0."
 ---
 
 \newpage
