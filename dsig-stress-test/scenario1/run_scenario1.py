@@ -29,6 +29,16 @@ import os
 import sys
 import time
 
+# Charger .env si présent (jamais versionné — voir .env.example)
+_env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+if os.path.exists(_env_path):
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _, _v = _line.partition("=")
+                os.environ[_k.strip()] = _v.strip().strip('"').strip("'")
+
 import pandas as pd
 
 # Ensure scenario1/ is on the path so local imports work

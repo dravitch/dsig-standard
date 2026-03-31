@@ -121,7 +121,7 @@ def generate_synthetic(gt):
         mem    = _baseline_series(n, 40, 70, seed_base + 2)
         lat    = _baseline_series(n, 3,  8,  seed_base + 3)
         disk   = _baseline_series(n, 5,  50, seed_base + 4)
-        procs  = _baseline_series(n, 80, 200, seed_base + 5).astype(int)
+        procs  = _baseline_series(n, 80, 200, seed_base + 5).astype(float)  # float pour accepter NaN
         uptime = np.arange(1, n + 1, dtype=float) * 60  # seconds since boot
 
         # -- Inject incidents per ground_truth --
