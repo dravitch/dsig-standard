@@ -1,0 +1,162 @@
+[
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-01",
+    "input_tokens": 126,
+    "output_tokens": 148,
+    "input_tokens_to_llm": 126,
+    "latency_s": 5.544,
+    "response": "**System Status & Recommended Action:**\nThe system is operating optimally with negligible latency variance (p50/p99 spread of only 0.5ms), moderate and stable resource utilization, and zero errors \u2014 no action is required at this time.\n\n---\n\n**Clarity Rating: 9/10**\n\n**Reasoning:** The signal is exceptionally clean and well-structured, providing labeled metrics, a named node, pipeline context, and a precise timestamp. The only reason it falls short of a perfect 10 is that it lacks defined baseline thresholds or SLO boundaries, meaning \"healthy\" is inferred by convention rather than explicitly confirmed against stated targets.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-01",
+    "input_tokens": 130,
+    "output_tokens": 134,
+    "input_tokens_to_llm": 130,
+    "latency_s": 4.145,
+    "response": "**System Status & Recommended Action:**\nThe DataMesh Data Product pipeline on node-hub-01 is fully operational with perfect quality and zero errors, requiring no immediate action beyond routine monitoring.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally well-structured with clearly labeled, quantified metrics across all key dimensions (latency, CPU, memory, error rate, uptime), with only minor room for improvement such as defining thresholds or baseline comparisons to contextualize whether, for example, 42.56% CPU or 5.72ms latency are within expected norms.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-01",
+    "input_tokens": 141,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 141,
+    "latency_s": 6.004,
+    "response": "## System Status & Recommended Action\n\n**The system is performing excellently with strong core vitals and local connectivity, but external-facing services (internet, DNS, hub, throughput) are severely degraded and require immediate investigation into the external network path or upstream provider.**\n\n---\n\n## Clarity Rating: **6/10**\n\n**Reasons for deduction:**\n- The **contradiction is stark but unexplained** \u2014 a score of 96/EXCELLENT coexists with internet=25, DNS=15, hub=15, which are critically low values, making the aggregate score misleading\n- **No units or thresholds provided** for metrics (is 25.0 on a 0",
+    "interpretability_rating": 6.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-01",
+    "input_tokens": 142,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 142,
+    "latency_s": 5.671,
+    "response": "## System Status & Recommended Action\n\n**The system is operating in excellent condition with stable, low-latency performance and zero errors \u2014 no action required; continue routine monitoring.**\n\n---\n\n## Clarity Rating: **8/10**\n\n**Rationale:**\n- \u2705 Well-structured with clear labels and consistent formatting\n- \u2705 Score, color, trend, and raw metrics are all present and unambiguous\n- \u2705 Zero error rate and clean baseline make interpretation straightforward\n- \u26a0\ufe0f **Minor deductions:**\n- `baseline_cycles=0` is slightly ambiguous \u2014 could mean \"no anomaly cycles\" or \"baseline not yet established\"",
+    "interpretability_rating": 8.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-02",
+    "input_tokens": 126,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 126,
+    "latency_s": 4.527,
+    "response": "## System Status & Recommended Action\n\n**The system is operating normally with excellent performance metrics across all dimensions; no action is required at this time.**\n\n---\n\n## Clarity Rating: **9/10**\n\n**Reasoning:**\n- \u2705 All key dimensions are covered (latency, CPU, memory, errors)\n- \u2705 Both median and tail latency (p50/p99) are provided, which is genuinely useful\n- \u2705 Values are concise and unambiguous\n- \u2705 Node and pipeline context is clearly identified\n- \u26a0\ufe0f **Minor deduction:** No defined thresholds or baselines are included, so \"normal",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-02",
+    "input_tokens": 130,
+    "output_tokens": 120,
+    "input_tokens_to_llm": 130,
+    "latency_s": 4.372,
+    "response": "**System Status & Recommended Action:**\nThe system is fully healthy with perfect data quality, zero errors, and 100% uptime, so no action is required beyond routine monitoring.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally well-structured and unambiguous, with labeled metrics, an ISO 8601 timestamp with timezone, and explicit status/quality fields \u2014 losing one point only because \"node-hub-01\" provides no contextual description of the node's role, which could aid faster triage if issues arose.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-02",
+    "input_tokens": 140,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 140,
+    "latency_s": 4.821,
+    "response": "## System Status & Recommended Action\n\n**The system is in excellent overall health with strong local network performance, but internet connectivity, DNS resolution, throughput, and hub metrics are critically degraded and require immediate investigation of the external network path or ISP connection.**\n\n---\n\n## Clarity Rating: **4/10**\n\n**Reasons for low clarity:**\n\n- \u26a0\ufe0f **Contradictory signals** \u2014 An aggregate score of `99/EXCELLENT/GREEN` is deeply misleading when `internet=25.0`, `dns=15.0`, `hub=15.0`, and `throughput=33.7` are all severely underperforming\n- \u26a0",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-02",
+    "input_tokens": 145,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 145,
+    "latency_s": 4.436,
+    "response": "## System Status & Recommended Action\n\n**The system is in an EXCELLENT/GREEN state with stable performance metrics, but the 20% error rate is a critical anomaly that requires immediate investigation despite the high composite score, as it likely indicates a scoring miscalibration or a serious underlying fault being masked by good latency and CPU metrics.**\n\n---\n\n## Clarity Rating: **4/10**\n\n### Reasons for Low Clarity:\n\n| Issue | Detail |\n|-------|---------|\n| **Contradictory signals** | `label=EXCELLENT` directly conflicts with `error_rate=20%` \u2014 a 20% error rate is never excellent |\n| **Score masking**",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-03",
+    "input_tokens": 126,
+    "output_tokens": 133,
+    "input_tokens_to_llm": 126,
+    "latency_s": 4.885,
+    "response": "## System Status & Recommended Action\n\nThe system is **fully healthy** with low latency, moderate resource usage, and zero errors \u2014 no action is required at this time.\n\n---\n\n## Clarity Rating: **9/10**\n\n**Rationale:** The signal is exceptionally clear \u2014 it provides named metrics with units, a specific node and pipeline identifier, a precise timestamp with timezone, and all values are immediately interpretable without ambiguity. The only minor deduction is the absence of defined thresholds or baselines, which would make it a perfect **10** by allowing instant contextual comparison without external knowledge.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-03",
+    "input_tokens": 130,
+    "output_tokens": 105,
+    "input_tokens_to_llm": 130,
+    "latency_s": 3.673,
+    "response": "**System Status & Recommended Action:**\nThe system is fully operational with perfect quality, zero errors, and 100% uptime, so no action is required beyond routine monitoring.\n\n**Clarity Rating: 9/10**\n\nAll key metrics are explicitly labeled, numerically precise, and immediately interpretable, with the only minor deduction being that no baseline thresholds or alert boundaries are provided for contextual comparison (e.g., what latency or CPU level would trigger concern).",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-03",
+    "input_tokens": 145,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 145,
+    "latency_s": 5.15,
+    "response": "## System Status & Recommended Action\n\nThe system is in a **DEGRADED state with a critical downward trend**, where internet connectivity, DNS resolution, hub connectivity, and throughput are severely impaired while local network remains partially functional; **immediately investigate the WAN/gateway connection, DNS servers, and hub infrastructure, as a near-complete external network failure appears imminent or already in progress.**\n\n---\n\n## Clarity Rating: **7/10**\n\n**Strengths:**\n- Clear numerical scoring and color-coded labels\n- Trend indicator (`CRITICAL_FALL`) is unambiguous\n- Vital breakdown gives useful component-level visibility\n\n**Weaknesses:**\n- `baseline_cycles",
+    "interpretability_rating": 7.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-03",
+    "input_tokens": 145,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 145,
+    "latency_s": 3.929,
+    "response": "## System Status & Recommended Action\n**The system is operating in excellent condition with stable, low-latency performance and zero errors \u2014 no action is required, continue normal monitoring.**\n\n---\n\n## Clarity Rating: **9/10**\n\n**Rationale:**\n- \u2705 Score (89), label, color, and trend are all **consistently aligned** (no contradictions)\n- \u2705 Metrics are **specific and unambiguous** (p99 latency, CPU %, error rate)\n- \u2705 Timestamp, node ID, and pipeline source are clearly identified\n- \u2705 `baseline_cycles=0` is the **one minor ambigu",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-04",
+    "input_tokens": 126,
+    "output_tokens": 113,
+    "input_tokens_to_llm": 126,
+    "latency_s": 4.442,
+    "response": "**System Status & Recommended Action:**\nThe system is fully healthy with low latency, moderate resource utilization, and zero errors \u2014 no action is required at this time.\n\n**Clarity Rating: 9/10**\n\nThe signal is exceptionally clear, providing well-structured, labeled metrics with consistent formatting, a precise timestamp, and unambiguous values across all key dimensions; the only minor deduction is the absence of defined thresholds or baseline context that would make anomaly detection immediately self-evident without external reference.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-04",
+    "input_tokens": 130,
+    "output_tokens": 110,
+    "input_tokens_to_llm": 130,
+    "latency_s": 4.041,
+    "response": "**System Status & Recommended Action:**\nThe system is fully healthy with perfect quality, zero errors, and 100% uptime, so no action is required beyond routine monitoring.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally well-structured with clearly labeled metrics, an ISO 8601 timestamp with timezone, and unambiguous values \u2014 docking one point only because \"NOMINAL\" and `quality=1.00` are slightly redundant without a defined quality scale reference.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-04",
+    "input_tokens": 146,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 146,
+    "latency_s": 5.683,
+    "response": "## System Status & Recommended Action\n\n**The system is in a severely degraded state with critically collapsing performance across all metrics, particularly DNS (7.5/100) and hub connectivity (7.5/100); immediately investigate external network infrastructure, DNS resolvers, and hub connections on node-oracle-01 before full service failure occurs.**\n\n---\n\n## Signal Clarity Rating: **6/10**\n\n**Reasons for deductions:**\n- \u26a0\ufe0f **Ambiguous scoring scale** \u2014 it's unclear if sub-scores are weighted equally or hierarchically\n- \u26a0\ufe0f **`baseline_cycles=0`** \u2014 suggests no historical baseline exists, making \"",
+    "interpretability_rating": 6.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-04",
+    "input_tokens": 146,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 146,
+    "latency_s": 4.047,
+    "response": "## System Status & Recommended Action\n\n**The system is operating in excellent condition with stable, low-latency performance and zero errors \u2014 no action required; continue routine monitoring.**\n\n---\n\n## Clarity Rating: **8/10**\n\n**Rationale:**\n- \u2705 Well-structured with clear labels and consistent formatting\n- \u2705 Key metrics (latency, CPU, error rate) are explicitly named\n- \u2705 Score, label, color, and trend are unambiguous\n- \u26a0\ufe0f `baseline_cycles=0` is unclear \u2014 does this mean no baseline has been established, or cycles completed = 0? This introduces mild ambiguity\n-",
+    "interpretability_rating": 8.0
+  }
+]

@@ -1,0 +1,21 @@
+# Secrets — jamais versionnés
+.env
+.envrc
+*.env
+
+# Kaggle credentials
+kaggle.json
+
+# Virtual environment
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Dataset (trop lourd pour Git)
+scenario1/data/it_metrics.csv
+scenario1/data/*.csv
+scenario1/data/*.parquet
+
+# Résultats bruts (générés, pas de source)
+results/scenario1/raw_outputs/
