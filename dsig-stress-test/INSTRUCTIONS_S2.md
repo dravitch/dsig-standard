@@ -6,21 +6,92 @@ Voici les instructions complètes pour Claude Code Web.
 
 ## Contexte
 
-Les pipelines du Scenario 1 sont dans `scenario1/` et restent intacts.
-Le Scenario 2 les importe via `sys.path.insert`. Tu crées uniquement ce qui est
-nouveau. Tu ne touches à rien dans `scenario1/` sauf si une colonne du nouveau
-dataset impose d'adapter les 5 fonctions de scoring dans `pipeline_dsig.py` —
-et dans ce cas uniquement ces fonctions, documentées avec un commentaire
-`# SCENARIO2 ADAPTATION`.
+Les pipelines du Scenario 1 sont dans `scenario1/` et restent la base de
+référence. Le Scenario 2 les importe via `sys.path.insert`.
 
-Les corrections du cahier des charges `INSTRUCTIONS.md` (cap critique à 60)
-ont été appliquées au Scenario 1 ce soir. Elles sont déjà dans
-`scenario1/pipeline_dsig.py` et `scenario1/pipeline_otel_dsig.py`.
-Le Scenario 2 hérite de ces corrections automatiquement via l'import.
+Ce fichier contient deux phases dans l'ordre strict d'exécution :
+- **Phase A** : corriger les pipelines D-SIG du Scenario 1 (cap critique à 60)
+- **Phase B** : construire et exécuter le Scenario 2
+
+Ne pas commencer la Phase B avant que la Phase A soit terminée et validée.
 
 ---
 
-## Structure à créer
+## PHASE A — Correction des pipelines Scenario 1 (cap critique à 60)
+
+### Contexte de la correction
+
+Le Scenario 1 a révélé que le score D-SIG global peut être EXCELLENT ou GOOD
+alors que des dimensions critiques (`internet`, `dns`, `hub`) sont en zone
+CRITICAL (< 30). Cette contradiction nuit à l'interprétabilité.
+
+### Fichiers à modifier
+
+- `scenario1/pipeline_dsig.py`
+- `scenario1/pipeline_otel_dsig.py`
+
+### Modification technique
+
+Dans la fonction qui calcule le score final (après la somme pondérée,
+fail-fast, et précondition_gate), ajouter le plafonnement suivant :
+
+```python
+# Cap critique : si une dimension externe critique est < 30,
+# le score global ne peut pas dépasser 60 (limite supérieure de GOOD).
+# S'applique après fail-fast et précondition — ne les remplace pas.
+CRITICAL_DIMS = ['internet', 'dns', 'hub']
+CRITICAL_THRESHOLD = 30
+CRITICAL_CAP = 60
+
+dim_scores = {
+    'internet': dims.get('internet', {}).get('score', 100),
+    'dns':      dims.get('dns',      {}).get('score', 100),
+    'hub':      dims.get('hub',      {}).get('score', 100),
+}
+
+if any(v < CRITICAL_THRESHOLD for v in dim_scores.values()):
+    score = min(score_raw, CRITICAL_CAP)
+else:
+    score = score_raw
+```
+
+Règles D-SIG non modifiées :
+- `label` et `color` restent dérivés du score final après plafonnement (Rule 10)
+- `trend` calculé sur le score final
+- Les valeurs individuelles dans `dimensions` restent inchangées
+
+Ajouter un commentaire `# CRITICAL CAP v0.5 — DeepSeek correction` sur la
+ligne du plafonnement dans les deux fichiers.
+
+Ajouter une entrée dans `CHANGELOG.md` :
+```
+## [S1-corrected] - 2026-03-31
+### Fixed
+- pipeline_dsig.py : cap score à 60 si dimension critique (internet/dns/hub) < 30
+- pipeline_otel_dsig.py : même correction appliquée au pipeline hybride
+```
+
+### Livrable Phase A
+
+Relancer le Scenario 1 avec la correction :
+
+```bash
+python scenario1/run_scenario1.py --synthetic
+```
+
+Écrire les résultats dans `results/scenario1_corrected/` (pas dans
+`results/scenario1/` — conserver les résultats originaux intacts).
+
+Confirmer dans le terminal :
+```
+Phase A complete. Results in results/scenario1_corrected/
+```
+
+---
+
+## PHASE B — Scenario 2 : Network Traffic & Throughput Stress Test
+
+### Structure à créer
 
 ```
 dsig-stress-test/
@@ -46,7 +117,7 @@ results/scenario2/
 
 ---
 
-## Étape 0 — Vérité terrain (ground_truth_s2.json)
+### Étape B-0 — Vérité terrain (ground_truth_s2.json)
 
 Créer EN PREMIER. Immutable après création.
 
@@ -108,18 +179,13 @@ Créer EN PREMIER. Immutable après création.
 
 ---
 
-## Étape 1 — Dataset (fetch_data_s2.py)
+### Étape B-1 — Dataset (fetch_data_s2.py)
 
-### Dataset cible
+**Dataset cible :**
 Kaggle : `brjapon/servers-throughput-vs-latency`
 Télécharger via `kaggle datasets download` si disponible.
 
-### Mapping des colonnes vers le schéma D-SIG
-
-Inspecter les colonnes disponibles et mapper vers le schéma attendu par les
-pipelines. Logger le mapping dans `results/scenario2/ANALYSIS_PROTOCOL.md`.
-
-**Schéma cible attendu par les pipelines (identique au Scenario 1) :**
+**Schéma cible attendu par les pipelines :**
 
 | Colonne attendue | Description | Source probable dans S2 |
 |---|---|---|
@@ -129,58 +195,72 @@ pipelines. Logger le mapping dans `results/scenario2/ANALYSIS_PROTOCOL.md`.
 | `memory_usage` | mémoire % | `memory` ou absent → proxy |
 | `uptime_seconds` | uptime croissant | à simuler si absent |
 | `disk_io` | I/O disque | absent probable → proxy 0.5 |
+| `throughput_mbps` | débit réseau | `throughput` ou `bandwidth` |
 | `node_id` | identifiant nœud | `server_id` ou à créer |
 
-**Si une colonne est absente**, créer un proxy raisonnable et le documenter
-dans `ANALYSIS_PROTOCOL.md`. Ne pas bloquer l'exécution.
+**Si le dataset S2 utilise des noms de colonnes différents**, ne pas modifier
+les fichiers `pipeline_*.py`. Utiliser un dictionnaire `column_mapping` dans
+`run_scenario2.py` pour renommer les colonnes avant de passer les données :
 
-### Fallback synthétique
+```python
+COLUMN_MAPPING = {
+    "latency":    "network_latency_ms",
+    "cpu":        "cpu_usage",
+    "mem":        "memory_usage",
+    "uptime":     "uptime_seconds",
+    "io":         "disk_io",
+    "throughput": "throughput_mbps",
+    "server_id":  "node_id",
+}
+df = df.rename(columns=COLUMN_MAPPING)
+```
 
-Si l'API Kaggle n'est pas disponible, générer un dataset synthétique avec :
-- Colonnes : identiques au Scenario 1
+**Si une modification des pipelines est inévitable**, la limiter strictement
+aux 5 fonctions de scoring dans `scenario1/pipeline_dsig.py`, commenter avec
+`# SCENARIO2 ADAPTATION`, et vérifier que `run_scenario1.py` s'exécute
+toujours sans erreur après la modification.
+
+**Fallback synthétique** si Kaggle non disponible :
+- Colonnes exactes : `timestamp`, `network_latency_ms`, `cpu_usage`,
+  `memory_usage`, `uptime_seconds`, `disk_io`, `throughput_mbps`, `node_id`
+- `throughput_mbps` est obligatoire pour INC-S2-01 (burst)
 - Baseline : latency 5–15ms, throughput 80–120 Mbps, CPU 30–55%
 - 3 nodes : `node-local-01` (LOCAL), `node-hub-01` (CENTRAL), `node-oracle-01` (EXTERNAL)
-- Fréquence : 1 point/minute × 24h × 3 nodes = 4320 lignes minimum
-- Les 4 incidents injectés aux timestamps de `ground_truth_s2.json`
+- 1 point/minute × 24h × 3 nodes = 4320 lignes minimum
+- 4 incidents injectés aux timestamps de `ground_truth_s2.json`
 - Logger `data_source = "kaggle"` ou `data_source = "synthetic_s2"`
-
-**Différenciation obligatoire avec S1 :** les valeurs de throughput doivent être
-explicitement présentes (même synthétiques) pour que INC-S2-01 (burst) soit
-visible. Ajouter une colonne `throughput_mbps` si absente du dataset réel.
 
 ---
 
-## Étape 2 — Orchestrateur (run_scenario2.py)
+### Étape B-2 — Orchestrateur (run_scenario2.py)
 
 ```python
 import sys, os
 
-# Import des pipelines depuis scenario1 — NE PAS DUPLIQUER
+# Import des pipelines depuis scenario1 — ne pas dupliquer
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'scenario1'))
 
-from pipeline_otel import run_otel_pipeline
-from pipeline_datamesh import run_datamesh_pipeline
-from pipeline_dsig import run_dsig_pipeline
+from pipeline_otel      import run_otel_pipeline
+from pipeline_datamesh  import run_datamesh_pipeline
+from pipeline_dsig      import run_dsig_pipeline
 from pipeline_otel_dsig import run_otel_dsig_pipeline
-from metrics import compute_all_metrics
-from llm_eval import evaluate_all_signals
+from metrics            import compute_all_metrics
+from llm_eval           import evaluate_all_signals
 
 SCENARIO_DIR = os.path.dirname(__file__)
 RESULTS_DIR  = os.path.join(os.path.dirname(__file__), '..', 'results', 'scenario2')
-
-# Charger ground_truth_s2.json (pas ground_truth.json du S1)
-GT_FILE = os.path.join(SCENARIO_DIR, 'ground_truth_s2.json')
+GT_FILE      = os.path.join(SCENARIO_DIR, 'ground_truth_s2.json')  # S2 uniquement
 
 # Même logique que run_scenario1.py
-# Les 4 pipelines + métriques + LLM + export summary.csv
+# 4 pipelines + métriques + LLM + export summary.csv
 ```
 
-**Point clé :** `ground_truth_s2.json` est chargé explicitement. Le code ne
-doit jamais lire `ground_truth.json` du Scenario 1.
+`summary.csv` doit avoir le même format que `results/scenario1/summary.csv`
+pour permettre une comparaison directe entre scénarios par DeepSeek.
 
 ---
 
-## Étape 3 — ANALYSIS_PROTOCOL.md
+### Étape B-3 — ANALYSIS_PROTOCOL.md
 
 Créer dans `results/scenario2/` avant l'exécution. Documenter :
 
@@ -188,31 +268,25 @@ Créer dans `results/scenario2/` avant l'exécution. Documenter :
    colonne attendue, et quels proxies ont été utilisés.
 
 2. **Asymétrie Decision Latency** : `input_tokens_to_llm` loggué séparément
-   pour chaque pipeline. La différence de latence reflète la taille de l'input,
-   pas uniquement la qualité du format.
+   pour chaque pipeline.
 
-3. **Silence Resilience décomposée** : INC-S2-03 (silence oracle) évaluée
-   en deux sous-composantes indépendantes :
-   - `detection_score` : le silence a-t-il été détecté par le pipeline ?
-   - `diagnostic_score` : le diagnostic produit est-il correct vs ground truth ?
+3. **Silence Resilience décomposée** : INC-S2-03 évaluée en deux
+   sous-composantes indépendantes :
+   - `detection_score` : le silence a-t-il été détecté ?
+   - `diagnostic_score` : la cause est-elle correctement identifiée ?
 
-4. **INC-S2-04 spécifique à D-SIG** : la métrique Trust Accumulation Utility
-   (M08) est particulièrement pertinente sur cet incident. Logger
-   `baseline_cycles` à t=18h (avant) et t=19h (après rupture) pour que
-   DeepSeek puisse quantifier la valeur ajoutée.
+4. **INC-S2-04 et baseline_cycles** : logger `baseline_cycles` à t=18h
+   (avant rupture) et t=19h (après) pour quantifier Trust Accumulation Utility.
 
-5. **Différence S1 vs S2** : noter explicitement que S2 teste le throughput
-   burst (absent de S1) et le silence oracle (présent en S1 comme INC-04
-   mais maintenant en position centrale dans S2).
+5. **Héritage correction Phase A** : confirmer que le cap critique à 60 est
+   actif dans les pipelines D-SIG importés depuis scenario1/.
 
 ---
 
 ## Contraintes de livraison
 
-- Commande unique : `python scenario2/run_scenario2.py [--synthetic] [--skip-llm]`
-- Aucun input interactif
-- `results/scenario2/summary.csv` format identique à `results/scenario1/summary.csv`
-  pour permettre à DeepSeek une comparaison directe entre scénarios
-- Ne pas modifier les fichiers dans `scenario1/` sauf adaptation colonnes
-  documentée avec `# SCENARIO2 ADAPTATION`
-- Commit message : `feat: scenario2 - network throughput stress test`
+- Phase A : `python scenario1/run_scenario1.py --synthetic` → `results/scenario1_corrected/`
+- Phase B : `python scenario2/run_scenario2.py [--synthetic] [--skip-llm]`
+- Aucun input interactif dans les deux phases
+- Commit message Phase A : `fix: critical dimension cap ≤60 — pipeline_dsig + pipeline_otel_dsig`
+- Commit message Phase B : `feat: scenario2 - network throughput stress test`

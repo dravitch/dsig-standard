@@ -1,7 +1,7 @@
 [
   {
     "pipeline": "otel",
-    "M01_decision_latency_s": 4.849,
+    "M01_decision_latency_s": 4.725,
     "M02_signal_compactness_bytes": 279.9,
     "M03_noise_reduction_ratio_pct": 67.7,
     "M04_silence_resilience": {
@@ -17,7 +17,7 @@
   },
   {
     "pipeline": "datamesh",
-    "M01_decision_latency_s": 4.058,
+    "M01_decision_latency_s": 4.379,
     "M02_signal_compactness_bytes": 553.4,
     "M03_noise_reduction_ratio_pct": 36.15,
     "M04_silence_resilience": {
@@ -33,7 +33,7 @@
   },
   {
     "pipeline": "dsig",
-    "M01_decision_latency_s": 5.415,
+    "M01_decision_latency_s": 5.308,
     "M02_signal_compactness_bytes": 704.1,
     "M03_noise_reduction_ratio_pct": 18.76,
     "M04_silence_resilience": {
@@ -42,14 +42,14 @@
     },
     "M05_convergence_diagnostic_pct": 75.0,
     "M06_diagnostic_precision_pct": 75.0,
-    "M07_interpretability_score": 5.8,
+    "M07_interpretability_score": 6.0,
     "M08_trust_accumulation_utility": 100.0,
     "M09_false_alarm_rate_pct": 0.0,
     "M10_implementation_effort_loc": 304
   },
   {
     "pipeline": "otel_dsig",
-    "M01_decision_latency_s": 4.521,
+    "M01_decision_latency_s": 4.652,
     "M02_signal_compactness_bytes": 702.3,
     "M03_noise_reduction_ratio_pct": 18.96,
     "M04_silence_resilience": {
@@ -58,7 +58,7 @@
     },
     "M05_convergence_diagnostic_pct": 75.0,
     "M06_diagnostic_precision_pct": 75.0,
-    "M07_interpretability_score": 7.2,
+    "M07_interpretability_score": 7.5,
     "M08_trust_accumulation_utility": 0.0,
     "M09_false_alarm_rate_pct": 0.0,
     "M10_implementation_effort_loc": 118
