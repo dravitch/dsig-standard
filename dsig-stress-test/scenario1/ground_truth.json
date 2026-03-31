@@ -1,0 +1,52 @@
+{
+  "scenario": "IT Node Vitality Monitoring",
+  "dataset": "IT System Performance & Resource Metrics (Kaggle)",
+  "simulation_window": "24h",
+  "perspectives": {
+    "LOCAL": "Node metrics — CPU, memory, latency, uptime",
+    "CENTRAL": "Hub aggregation — rolling 5min averages across all nodes",
+    "EXTERNAL": "Oracle — external latency proxy, internet reachability"
+  },
+  "incidents": [
+    {
+      "id": "INC-01",
+      "t_start_h": 6,
+      "t_end_h": 8,
+      "type": "progressive_degradation",
+      "cause": "EXTERNAL",
+      "description": "Progressive latency increase 4ms → 180ms over 2h. LOCAL and CENTRAL still functional. Oracle degrades first.",
+      "expected_diagnosis": "ISP or upstream provider degradation",
+      "silent_source": null
+    },
+    {
+      "id": "INC-02",
+      "t_start_h": 10,
+      "t_end_h": 10.083,
+      "type": "fail_fast",
+      "cause": "LOCAL",
+      "description": "Vital service stops at t=10h (uptime=0, CPU=0). Immediate collapse.",
+      "expected_diagnosis": "Local node vital service failure",
+      "silent_source": null
+    },
+    {
+      "id": "INC-03",
+      "t_start_h": 14,
+      "t_end_h": 15.5,
+      "type": "silence_local",
+      "cause": "LOCAL",
+      "description": "LOCAL node stops emitting entirely. CENTRAL and EXTERNAL remain GREEN.",
+      "expected_diagnosis": "Local hardware or network isolation. Not an ISP issue.",
+      "silent_source": "LOCAL"
+    },
+    {
+      "id": "INC-04",
+      "t_start_h": 18,
+      "t_end_h": 19,
+      "type": "silence_oracle",
+      "cause": "EXTERNAL",
+      "description": "Oracle (EXTERNAL) stops emitting. LOCAL and CENTRAL nominal.",
+      "expected_diagnosis": "External monitoring provider issue. Internal systems unaffected.",
+      "silent_source": "EXTERNAL"
+    }
+  ]
+}
