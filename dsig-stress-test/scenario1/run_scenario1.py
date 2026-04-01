@@ -57,7 +57,8 @@ import llm_eval
 
 SCENARIO_DIR  = os.path.dirname(__file__)
 ROOT_DIR      = os.path.dirname(SCENARIO_DIR)
-RESULTS_DIR   = os.path.join(ROOT_DIR, "results", "scenario1")
+RESULTS_DIR   = os.environ.get("DSIG_RESULTS_DIR",
+                    os.path.join(ROOT_DIR, "results", "scenario1"))
 RAW_DIR       = os.path.join(RESULTS_DIR, "raw_outputs")
 GT_PATH       = os.path.join(SCENARIO_DIR, "ground_truth.json")
 DATA_CSV      = os.path.join(SCENARIO_DIR, "data", "it_metrics.csv")

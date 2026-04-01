@@ -98,6 +98,7 @@ def run(df: pd.DataFrame) -> list[dict]:
                                    else alpha * row["memory_usage"] + (1 - alpha) * baseline["mem"])
 
             # Stage 2 — D-SIG distillation
+            # CRITICAL CAP v0.5 — DeepSeek correction (applied inside compute_dsig_signal)
             sig = dsig.compute_dsig_signal(row, prev_scores, baseline, baseline_cycle)
 
             # Track cross-node scores for baseline_cycles

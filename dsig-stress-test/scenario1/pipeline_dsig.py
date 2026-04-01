@@ -231,7 +231,24 @@ def compute_dsig_signal(row: dict, prev_scores: list[int],
     if vital_score == 0:
         raw_score = min(20, raw_score * 0.2)
 
-    score = min(100, max(0, int(round(raw_score))))
+    score_raw = min(100, max(0, int(round(raw_score))))
+
+    # CRITICAL CAP v0.5 — DeepSeek correction
+    # If any external critical dimension (internet/dns/hub) is < 30,
+    # the global score cannot exceed 60 (top of GOOD band).
+    # Applied after fail-fast and precondition — does not replace them.
+    CRITICAL_DIMS_SCORES = {
+        "internet": int_score,
+        "dns":      dns_s,
+        "hub":      hub_s,
+    }
+    CRITICAL_THRESHOLD = 30
+    CRITICAL_CAP       = 60
+    if any(v < CRITICAL_THRESHOLD for v in CRITICAL_DIMS_SCORES.values()):
+        score = min(score_raw, CRITICAL_CAP)
+    else:
+        score = score_raw
+
     label, color = score_to_label_color(score)
     trend = compute_trend(prev_scores, score)
 
