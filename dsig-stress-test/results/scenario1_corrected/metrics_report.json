@@ -1,0 +1,66 @@
+[
+  {
+    "pipeline": "otel",
+    "M01_decision_latency_s": null,
+    "M02_signal_compactness_bytes": 279.9,
+    "M03_noise_reduction_ratio_pct": 70.43,
+    "M04_silence_resilience": {
+      "detection_score": 100.0,
+      "diagnostic_score": 100.0
+    },
+    "M05_convergence_diagnostic_pct": 100.0,
+    "M06_diagnostic_precision_pct": 100.0,
+    "M07_interpretability_score": null,
+    "M08_trust_accumulation_utility": null,
+    "M09_false_alarm_rate_pct": 0.0,
+    "M10_implementation_effort_loc": 133
+  },
+  {
+    "pipeline": "datamesh",
+    "M01_decision_latency_s": null,
+    "M02_signal_compactness_bytes": 553.4,
+    "M03_noise_reduction_ratio_pct": 41.55,
+    "M04_silence_resilience": {
+      "detection_score": 100.0,
+      "diagnostic_score": 100.0
+    },
+    "M05_convergence_diagnostic_pct": 100.0,
+    "M06_diagnostic_precision_pct": 100.0,
+    "M07_interpretability_score": null,
+    "M08_trust_accumulation_utility": null,
+    "M09_false_alarm_rate_pct": 0.0,
+    "M10_implementation_effort_loc": 157
+  },
+  {
+    "pipeline": "dsig",
+    "M01_decision_latency_s": null,
+    "M02_signal_compactness_bytes": 700.7,
+    "M03_noise_reduction_ratio_pct": 25.98,
+    "M04_silence_resilience": {
+      "detection_score": 100.0,
+      "diagnostic_score": 100.0
+    },
+    "M05_convergence_diagnostic_pct": 75.0,
+    "M06_diagnostic_precision_pct": 75.0,
+    "M07_interpretability_score": null,
+    "M08_trust_accumulation_utility": 0.0,
+    "M09_false_alarm_rate_pct": 0.0,
+    "M10_implementation_effort_loc": 315
+  },
+  {
+    "pipeline": "otel_dsig",
+    "M01_decision_latency_s": null,
+    "M02_signal_compactness_bytes": 698.4,
+    "M03_noise_reduction_ratio_pct": 26.22,
+    "M04_silence_resilience": {
+      "detection_score": 100.0,
+      "diagnostic_score": 100.0
+    },
+    "M05_convergence_diagnostic_pct": 75.0,
+    "M06_diagnostic_precision_pct": 75.0,
+    "M07_interpretability_score": null,
+    "M08_trust_accumulation_utility": 0.0,
+    "M09_false_alarm_rate_pct": 0.0,
+    "M10_implementation_effort_loc": 118
+  }
+]

@@ -1,8 +1,8 @@
 """
-run_scenario1.py — Orchestrator for D-SIG Stress Test · Scenario 1.
+run_scenario2.py — Orchestrator for D-SIG Stress Test · Scenario 2.
 
 Usage:
-    python scenario1/run_scenario1.py [--synthetic] [--skip-llm]
+    python scenario2/run_scenario2.py [--synthetic] [--skip-llm]
 
     --synthetic   Force synthetic dataset generation (skip Kaggle attempt)
     --skip-llm    Skip LLM evaluation (useful for dry runs without API key)
@@ -10,17 +10,19 @@ Usage:
 Single command, no interactive input.
 
 Steps:
-    1. Load ground truth
-    2. Fetch / generate dataset
-    3. Run all 4 pipelines on the same raw data
+    1. Load ground truth (scenario2/ground_truth_s2.json)
+    2. Fetch / generate dataset (throughput + latency)
+    3. Run all 4 pipelines on the same raw data (imported from scenario1/)
     4. For each pipeline × each incident: extract signal, call LLM
     5. Compute all 10 metrics per pipeline
-    6. Write results/scenario1/
+    6. Write results/scenario2/
        - raw_outputs/*.json
        - metrics_report.json
        - llm_responses.json
        - summary.csv
-       - ANALYSIS_PROTOCOL.md (if not already present)
+
+Pipelines are imported from scenario1/ — not duplicated.
+Column mapping is applied here before data reaches the pipelines.
 """
 
 import csv
@@ -29,20 +31,15 @@ import os
 import sys
 import time
 
-# Charger .env si présent (jamais versionné — voir .env.example)
-_env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
-if os.path.exists(_env_path):
-    with open(_env_path) as _f:
-        for _line in _f:
-            _line = _line.strip()
-            if _line and not _line.startswith("#") and "=" in _line:
-                _k, _, _v = _line.partition("=")
-                os.environ[_k.strip()] = _v.strip().strip('"').strip("'")
-
 import pandas as pd
 
-# Ensure scenario1/ is on the path so local imports work
-sys.path.insert(0, os.path.dirname(__file__))
+# Import pipelines and shared modules from scenario1
+SCENARIO1_DIR = os.path.join(os.path.dirname(__file__), "..", "scenario1")
+sys.path.insert(0, SCENARIO1_DIR)
+
+# Also add scenario2/data to path for fetch_data_s2
+SCENARIO2_DIR = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(SCENARIO2_DIR, "data"))
 
 import pipeline_otel
 import pipeline_datamesh
@@ -55,15 +52,30 @@ import llm_eval
 # Paths
 # ---------------------------------------------------------------------------
 
-SCENARIO_DIR  = os.path.dirname(__file__)
-ROOT_DIR      = os.path.dirname(SCENARIO_DIR)
+ROOT_DIR      = os.path.dirname(SCENARIO2_DIR)
 RESULTS_DIR   = os.environ.get("DSIG_RESULTS_DIR",
-                    os.path.join(ROOT_DIR, "results", "scenario1"))
+                    os.path.join(ROOT_DIR, "results", "scenario2"))
 RAW_DIR       = os.path.join(RESULTS_DIR, "raw_outputs")
-GT_PATH       = os.path.join(SCENARIO_DIR, "ground_truth.json")
-DATA_CSV      = os.path.join(SCENARIO_DIR, "data", "it_metrics.csv")
+GT_PATH       = os.path.join(SCENARIO2_DIR, "ground_truth_s2.json")
+DATA_CSV      = os.path.join(SCENARIO2_DIR, "data", "network_metrics.csv")
 
 PIPELINE_NAMES = ["otel", "datamesh", "dsig", "otel_dsig"]
+
+# Column mapping: S2 dataset → pipeline schema
+# (pipeline_*.py expect the S2 column names used by fetch_data_s2 directly,
+#  but this mapping handles any Kaggle variant that may differ)
+COLUMN_MAPPING = {
+    "latency":        "network_latency_ms",
+    "response_time":  "network_latency_ms",
+    "cpu":            "cpu_usage",
+    "memory":         "memory_usage",
+    "mem":            "memory_usage",
+    "uptime":         "uptime_seconds",
+    "io":             "disk_io",
+    "throughput":     "throughput_mbps",
+    "bandwidth":      "throughput_mbps",
+    "server_id":      "node_id",
+}
 
 
 def _ensure_dirs():
@@ -77,22 +89,38 @@ def _load_ground_truth() -> dict:
 
 
 def _load_data(force_synthetic: bool) -> tuple[pd.DataFrame, str]:
-    """Return (dataframe, data_source_str). Fetch if CSV not present."""
-    # Import here to avoid circular issues; data dir is a sub-package
-    sys.path.insert(0, os.path.join(SCENARIO_DIR, "data"))
-    import fetch_data
+    """Return (dataframe, data_source_str)."""
+    import fetch_data_s2
     if not os.path.exists(DATA_CSV):
-        csv_path, data_source = fetch_data.fetch(force_synthetic=force_synthetic)
+        csv_path, data_source = fetch_data_s2.fetch(force_synthetic=force_synthetic)
     else:
-        print(f"[run] Using cached dataset: {DATA_CSV}")
+        print(f"[run_s2] Using cached dataset: {DATA_CSV}")
         data_source = "cached"
         csv_path    = DATA_CSV
 
     df = pd.read_csv(csv_path, parse_dates=["timestamp"])
-    # Ensure timezone awareness
     if df["timestamp"].dt.tz is None:
         df["timestamp"] = df["timestamp"].dt.tz_localize("UTC")
-    print(f"[run] Dataset loaded: {len(df):,} rows  source={data_source}")
+
+    # Apply column mapping for Kaggle variants
+    df = df.rename(columns={k: v for k, v in COLUMN_MAPPING.items() if k in df.columns})
+
+    # Ensure pipeline-expected columns exist (add NaN proxy if missing)
+    for col in ["cpu_usage", "memory_usage", "disk_io", "uptime_seconds",
+                "network_latency_ms", "throughput_mbps"]:
+        if col not in df.columns:
+            df[col] = float("nan")
+
+    # perspective column required by pipelines
+    if "perspective" not in df.columns:
+        node_to_persp = {
+            "node-local-01":  "LOCAL",
+            "node-hub-01":    "CENTRAL",
+            "node-oracle-01": "EXTERNAL",
+        }
+        df["perspective"] = df["node_id"].map(node_to_persp).fillna("LOCAL")
+
+    print(f"[run_s2] Dataset loaded: {len(df):,} rows  source={data_source}")
     return df, data_source
 
 
@@ -105,9 +133,9 @@ def _run_pipelines(df: pd.DataFrame) -> dict[str, list[dict]]:
         "otel_dsig": pipeline_otel_dsig.run,
     }
     for name, fn in runners.items():
-        print(f"[run] Running pipeline: {name} ...", end=" ", flush=True)
-        t0 = time.perf_counter()
-        sigs = fn(df)
+        print(f"[run_s2] Running pipeline: {name} ...", end=" ", flush=True)
+        t0      = time.perf_counter()
+        sigs    = fn(df)
         elapsed = time.perf_counter() - t0
         print(f"{len(sigs)} signals in {elapsed:.1f}s")
         all_signals[name] = sigs
@@ -120,7 +148,7 @@ def _write_raw_outputs(all_signals: dict, data_source: str):
         payload  = {"pipeline": name, "data_source": data_source, "signals": sigs}
         with open(out_path, "w") as f:
             json.dump(payload, f, indent=2, default=str)
-        print(f"[run] Raw output → {out_path}  ({len(sigs)} signals)")
+        print(f"[run_s2] Raw output → {out_path}  ({len(sigs)} signals)")
 
 
 def _compute_metrics(all_signals: dict, gt: dict,
@@ -130,7 +158,7 @@ def _compute_metrics(all_signals: dict, gt: dict,
         sigs = all_signals.get(name, [])
         m    = metrics_mod.compute_all(name, sigs, gt, llm_results)
         all_metrics.append(m)
-        print(f"[run] Metrics [{name}]: "
+        print(f"[run_s2] Metrics [{name}]: "
               f"M02={m['M02_signal_compactness_bytes']}B  "
               f"M03={m['M03_noise_reduction_ratio_pct']}%  "
               f"M09_FAR={m['M09_false_alarm_rate_pct']}%")
@@ -142,23 +170,6 @@ def _write_summary_csv(all_metrics: list[dict]):
     if not all_metrics:
         return
 
-    fieldnames = list(all_metrics[0].keys())
-    with open(out_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in all_metrics:
-            # Flatten nested dicts for CSV
-            flat = {}
-            for k, v in row.items():
-                if isinstance(v, dict):
-                    for sub_k, sub_v in v.items():
-                        flat[f"{k}.{sub_k}"] = sub_v
-                else:
-                    flat[k] = v
-            # Write with flattened fieldnames
-            writer.writerow({fn: flat.get(fn, row.get(fn)) for fn in fieldnames})
-
-    # Write a clean version with flattened keys
     flat_rows = []
     for row in all_metrics:
         flat = {}
@@ -176,17 +187,7 @@ def _write_summary_csv(all_metrics: list[dict]):
         writer.writeheader()
         writer.writerows(flat_rows)
 
-    print(f"[run] Summary CSV → {out_path}")
-
-
-def _write_analysis_protocol():
-    """Create ANALYSIS_PROTOCOL.md in results/scenario1/ if not already present."""
-    proto_path = os.path.join(RESULTS_DIR, "ANALYSIS_PROTOCOL.md")
-    if os.path.exists(proto_path):
-        return
-    src = os.path.join(ROOT_DIR, "results", "scenario1", "ANALYSIS_PROTOCOL.md")
-    # Will be created by the initial file creation step; skip silently if missing
-    print(f"[run] ANALYSIS_PROTOCOL.md expected at {proto_path}")
+    print(f"[run_s2] Summary CSV → {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -198,14 +199,14 @@ def main():
     skip_llm        = "--skip-llm"  in sys.argv
 
     print("=" * 60)
-    print("D-SIG Stress Test — Scenario 1: IT Node Vitality Monitoring")
+    print("D-SIG Stress Test — Scenario 2: Network Throughput Stress")
     print("=" * 60)
 
     _ensure_dirs()
 
     # Step 1 — Ground truth
     gt = _load_ground_truth()
-    print(f"[run] Ground truth loaded: {len(gt['incidents'])} incidents")
+    print(f"[run_s2] Ground truth loaded: {len(gt['incidents'])} incidents")
 
     # Step 2 — Dataset
     df, data_source = _load_data(force_synthetic)
@@ -217,33 +218,32 @@ def main():
     # Step 4 — LLM evaluation
     llm_results = None
     if not skip_llm:
-        print("[run] Starting LLM evaluation (16 calls) ...")
+        print("[run_s2] Starting LLM evaluation (16 calls) ...")
         try:
             llm_results = llm_eval.run_all_evaluations(all_signals, gt)
             llm_path = os.path.join(RESULTS_DIR, "llm_responses.json")
             with open(llm_path, "w") as f:
                 json.dump(llm_results, f, indent=2, default=str)
-            print(f"[run] LLM responses → {llm_path}")
+            print(f"[run_s2] LLM responses → {llm_path}")
         except EnvironmentError as e:
-            print(f"[run] WARNING: {e}  — skipping LLM evaluation.")
+            print(f"[run_s2] WARNING: {e}  — skipping LLM evaluation.")
         except Exception as e:
-            print(f"[run] ERROR during LLM evaluation: {e}  — continuing without LLM metrics.")
+            print(f"[run_s2] ERROR during LLM evaluation: {e}  — continuing without LLM metrics.")
     else:
-        print("[run] LLM evaluation skipped (--skip-llm).")
+        print("[run_s2] LLM evaluation skipped (--skip-llm).")
 
     # Step 5 — Metrics
-    all_metrics = _compute_metrics(all_signals, gt, llm_results)
+    all_metrics  = _compute_metrics(all_signals, gt, llm_results)
     metrics_path = os.path.join(RESULTS_DIR, "metrics_report.json")
     with open(metrics_path, "w") as f:
         json.dump(all_metrics, f, indent=2, default=str)
-    print(f"[run] Metrics report → {metrics_path}")
+    print(f"[run_s2] Metrics report → {metrics_path}")
 
     # Step 6 — Summary CSV
     _write_summary_csv(all_metrics)
-    _write_analysis_protocol()
 
     print("=" * 60)
-    print("Scenario 1 complete. Results in results/scenario1/")
+    print("Scenario 2 complete. Results in results/scenario2/")
     print("=" * 60)
 
 

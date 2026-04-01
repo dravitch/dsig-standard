@@ -215,9 +215,12 @@ def m08_trust_accumulation(signals: list[dict], gt: dict, pipeline: str) -> floa
     # Check how many resets align with a real incident (within ±10 min)
     import pandas as pd
 
+    # SCENARIO2 ADAPTATION — derive sim_date from signals instead of hardcoding
+    sim_date = (pd.Timestamp(signals[0]["timestamp"]).strftime("%Y-%m-%d")
+                if signals else "2026-03-30")
+
     incident_ranges = []
     for inc in gt["incidents"]:
-        sim_date = "2026-03-30"
         t_s = pd.Timestamp(f"{sim_date}T{int(inc['t_start_h']):02d}:"
                            f"{int((inc['t_start_h'] % 1) * 60):02d}:00Z")
         t_e = pd.Timestamp(f"{sim_date}T{int(inc['t_end_h']):02d}:"
@@ -244,9 +247,12 @@ def m09_false_alarm_rate(signals: list[dict], gt: dict, pipeline: str) -> float:
     """
     import pandas as pd
 
+    # SCENARIO2 ADAPTATION — derive sim_date from signals instead of hardcoding
+    sim_date = (pd.Timestamp(signals[0]["timestamp"]).strftime("%Y-%m-%d")
+                if signals else "2026-03-30")
+
     incident_ranges = []
     for inc in gt["incidents"]:
-        sim_date = "2026-03-30"
         t_s = pd.Timestamp(f"{sim_date}T{int(inc['t_start_h']):02d}:"
                            f"{int((inc['t_start_h'] % 1) * 60):02d}:00Z")
         t_e = pd.Timestamp(f"{sim_date}T{int(inc['t_end_h']):02d}:"
