@@ -45,7 +45,7 @@
     "M07_interpretability_score": null,
     "M08_trust_accumulation_utility": 0.0,
     "M09_false_alarm_rate_pct": 0.0,
-    "M10_implementation_effort_loc": 315
+    "M10_implementation_effort_loc": 338
   },
   {
     "pipeline": "otel_dsig",
@@ -61,6 +61,6 @@
     "M07_interpretability_score": null,
     "M08_trust_accumulation_utility": 0.0,
     "M09_false_alarm_rate_pct": 0.0,
-    "M10_implementation_effort_loc": 118
+    "M10_implementation_effort_loc": 135
   }
 ]
