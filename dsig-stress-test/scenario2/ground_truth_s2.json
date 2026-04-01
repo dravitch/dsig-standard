@@ -1,0 +1,53 @@
+{
+  "scenario": "Network Traffic & Throughput Stress Test",
+  "dataset": "Servers throughput vs latency (Kaggle)",
+  "simulation_window": "24h",
+  "focus": "Distillation sous charge réseau variable — burst, ISP dégradé, oracle silence, rupture baseline_cycles",
+  "perspectives": {
+    "LOCAL":    "Node réseau — throughput, latency, jitter, packet_loss",
+    "CENTRAL":  "Hub — rolling 10min averages cross-nodes",
+    "EXTERNAL": "Oracle — latency externe, disponibilité ISP"
+  },
+  "incidents": [
+    {
+      "id": "INC-S2-01",
+      "t_start_h": 4,
+      "t_end_h": 6,
+      "type": "throughput_burst",
+      "cause": "LOCAL",
+      "description": "Pic de charge : throughput × 3, latency monte à 250ms, jitter élevé. LOCAL dégradé. CENTRAL et EXTERNAL nominaux.",
+      "expected_diagnosis": "Surcharge locale. Pas de panne ISP.",
+      "silent_source": null
+    },
+    {
+      "id": "INC-S2-02",
+      "t_start_h": 9,
+      "t_end_h": 11,
+      "type": "isp_degradation",
+      "cause": "EXTERNAL",
+      "description": "Dégradation ISP progressive : latency externe 8ms → 400ms sur 2h. LOCAL stable. CENTRAL voit la dégradation via hub. EXTERNAL dégrade en premier.",
+      "expected_diagnosis": "ISP ou infrastructure externe. Systèmes locaux non affectés.",
+      "silent_source": null
+    },
+    {
+      "id": "INC-S2-03",
+      "t_start_h": 15,
+      "t_end_h": 16.5,
+      "type": "silence_oracle",
+      "cause": "EXTERNAL",
+      "description": "Oracle (EXTERNAL) cesse d'émettre. LOCAL et CENTRAL nominaux. Test du principe PROD-02 : silence oracle = signal informatif.",
+      "expected_diagnosis": "Problème du fournisseur de monitoring externe. Systèmes internes non affectés.",
+      "silent_source": "EXTERNAL"
+    },
+    {
+      "id": "INC-S2-04",
+      "t_start_h": 19,
+      "t_end_h": 20,
+      "type": "baseline_cycles_break",
+      "cause": "LOCAL",
+      "description": "Rupture soudaine après 18h de convergence stable (baseline_cycles élevé). Throughput chute à 10% du nominal. Les 3 perspectives voient la dégradation simultanément.",
+      "expected_diagnosis": "Rupture historique significative. Convergence multi-perspective confirme l'incident réel.",
+      "silent_source": null
+    }
+  ]
+}
