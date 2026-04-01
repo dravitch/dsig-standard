@@ -21,6 +21,7 @@ composable last-mile format layered on top of it.
 
 import json
 import math
+import re
 
 import numpy as np
 import pandas as pd
@@ -74,12 +75,15 @@ def run(df: pd.DataFrame) -> list[dict]:
     for sig in otel_signals:
         by_node[sig["node_id"]].append(sig)
 
+    # Shared across all nodes so cross-node divergence can be computed (Rule 9)
+    window_scores_shared: dict = {}   # ts_str → {node_id: score}
+    node_bc: dict = {}               # node_id → baseline_cycle counter
+
     signals = []
     for node_id, node_otel_sigs in sorted(by_node.items()):
         prev_scores    = []
         baseline       = {"cpu": None, "mem": None}
-        baseline_cycle = 0
-        window_scores  = {}   # ts_str → score
+        node_bc[node_id] = 0
 
         for otel_sig in node_otel_sigs:
             ts_str  = otel_sig["timestamp"]
@@ -99,18 +103,12 @@ def run(df: pd.DataFrame) -> list[dict]:
 
             # Stage 2 — D-SIG distillation
             # CRITICAL CAP v0.5 — DeepSeek correction (applied inside compute_dsig_signal)
-            sig = dsig.compute_dsig_signal(row, prev_scores, baseline, baseline_cycle)
+            sig = dsig.compute_dsig_signal(row, prev_scores, baseline, node_bc[node_id])
 
-            # Track cross-node scores for baseline_cycles
-            if ts_str not in window_scores:
-                window_scores[ts_str] = {}
-            window_scores[ts_str][node_id] = sig["score"]
-            scores_at_ts = window_scores[ts_str]
-            if len(scores_at_ts) >= 2:
-                vals    = list(scores_at_ts.values())
-                max_div = max(vals) - min(vals)
-                baseline_cycle = baseline_cycle + 1 if max_div <= 30 else 0
-                sig["baseline_cycles"] = baseline_cycle
+            # Track cross-node scores for baseline_cycles (shared across nodes)
+            if ts_str not in window_scores_shared:
+                window_scores_shared[ts_str] = {}
+            window_scores_shared[ts_str][node_id] = sig["score"]
 
             # Signal text for LLM
             if sig["stale"]:
@@ -149,5 +147,30 @@ def run(df: pd.DataFrame) -> list[dict]:
                 "total_pipeline_bytes": otel_bytes + dsig_bytes,
                 **sig,
             })
+
+    # Post-processing: recompute baseline_cycles using complete shared window_scores (Rule 9)
+    # Required because per-node loop processes all hub windows before local/oracle.
+    _ts_to_sigs: dict = {}
+    for _sig in signals:
+        _ts_to_sigs.setdefault(_sig["timestamp"], []).append(_sig)
+
+    for _ts in sorted(_ts_to_sigs.keys()):
+        _all_scores = window_scores_shared.get(_ts, {})
+        if len(_all_scores) >= 2:
+            _vals    = list(_all_scores.values())
+            _max_div = max(_vals) - min(_vals)
+            for _sig in _ts_to_sigs[_ts]:
+                _nid = _sig["source_id"]
+                if _max_div <= 30:
+                    node_bc[_nid] += 1
+                else:
+                    node_bc[_nid] = 0
+                _sig["baseline_cycles"] = node_bc[_nid]
+                if "signal_for_llm" in _sig:
+                    _sig["signal_for_llm"] = re.sub(
+                        r"baseline_cycles=\d+",
+                        f"baseline_cycles={node_bc[_nid]}",
+                        _sig["signal_for_llm"],
+                    )
 
     return signals
