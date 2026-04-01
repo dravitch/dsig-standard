@@ -27,6 +27,7 @@ baseline_cycles (Rule 9, v0.5):
 
 import json
 import math
+import re
 from datetime import timezone
 
 import numpy as np
@@ -394,5 +395,32 @@ def run(df: pd.DataFrame) -> list[dict]:
                 "output_bytes":   output_bytes,
                 **sig,
             })
+
+    # Post-processing: recompute baseline_cycles using complete window_scores (Rule 9)
+    # Required because sorted(nodes) processes all hub windows before local/oracle,
+    # so node-hub-01 never sees other nodes' scores during the forward pass.
+    _ts_to_sigs: dict = {}
+    for _sig in signals:
+        _ts_to_sigs.setdefault(_sig["timestamp"], []).append(_sig)
+
+    _node_bc: dict = {n: 0 for n in nodes}
+    for _ts in sorted(_ts_to_sigs.keys()):
+        _all_scores = window_scores.get(_ts, {})
+        if len(_all_scores) >= 2:
+            _vals    = list(_all_scores.values())
+            _max_div = max(_vals) - min(_vals)
+            for _sig in _ts_to_sigs[_ts]:
+                _nid = _sig["source_id"]
+                if _max_div <= 30:
+                    _node_bc[_nid] += 1
+                else:
+                    _node_bc[_nid] = 0
+                _sig["baseline_cycles"] = _node_bc[_nid]
+                if "signal_for_llm" in _sig:
+                    _sig["signal_for_llm"] = re.sub(
+                        r"baseline_cycles=\d+",
+                        f"baseline_cycles={_node_bc[_nid]}",
+                        _sig["signal_for_llm"],
+                    )
 
     return signals
