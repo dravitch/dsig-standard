@@ -91,6 +91,7 @@ pkgs.mkShell {
     pkgs.ripgrep           # recherche rapide
     pkgs.fd                # alternative moderne à find
     pkgs.fzf               # recherche floue
+    pkgs.gh                # GitHub CLI
 
     # Bibliothèques C (pour certains paquets Python)
     pkgs.gcc
@@ -184,6 +185,22 @@ pkgs.mkShell {
       echo "   Pour télécharger les datasets, configurez vos identifiants Kaggle :"
       echo "   mkdir -p ~/.kaggle && cp /chemin/vers/kaggle.json ~/.kaggle/"
       echo "   chmod 600 ~/.kaggle/kaggle.json"
+    fi
+    
+    # ------------------------------------------------------------
+    # Vérification de GitHub CLI (gh)
+    # ------------------------------------------------------------
+    if command -v gh >/dev/null 2>&1; then
+      GH_VERSION=$(gh --version | head -n1)
+      echo "✅ GitHub CLI disponible : $GH_VERSION"
+      # Vérifier si un token est configuré (optionnel)
+      if gh auth status >/dev/null 2>&1; then
+        echo "   ✔️  Authentification GitHub active"
+      else
+        echo "   ⚠️  GitHub non authentifié – utilisez 'gh auth login' si besoin"
+      fi
+    else
+      echo "⚠️  GitHub CLI (gh) non trouvé – assurez-vous d’avoir ajouté pkgs.gh à buildInputs"
     fi
 
     # ------------------------------------------------------------

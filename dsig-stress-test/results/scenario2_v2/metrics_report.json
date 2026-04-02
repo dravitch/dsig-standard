@@ -1,66 +1,66 @@
 [
   {
     "pipeline": "otel",
-    "M01_decision_latency_s": null,
+    "M01_decision_latency_s": 4.124,
     "M02_signal_compactness_bytes": 280.8,
-    "M03_noise_reduction_ratio_pct": 70.34,
+    "M03_noise_reduction_ratio_pct": 67.6,
     "M04_silence_resilience": {
       "detection_score": 100.0,
       "diagnostic_score": 100.0
     },
     "M05_convergence_diagnostic_pct": 100.0,
     "M06_diagnostic_precision_pct": 100.0,
-    "M07_interpretability_score": null,
+    "M07_interpretability_score": 9.0,
     "M08_trust_accumulation_utility": null,
     "M09_false_alarm_rate_pct": 0.0,
     "M10_implementation_effort_loc": 133
   },
   {
     "pipeline": "datamesh",
-    "M01_decision_latency_s": null,
+    "M01_decision_latency_s": 4.323,
     "M02_signal_compactness_bytes": 555.4,
-    "M03_noise_reduction_ratio_pct": 41.33,
+    "M03_noise_reduction_ratio_pct": 35.92,
     "M04_silence_resilience": {
       "detection_score": 100.0,
       "diagnostic_score": 100.0
     },
     "M05_convergence_diagnostic_pct": 100.0,
     "M06_diagnostic_precision_pct": 100.0,
-    "M07_interpretability_score": null,
+    "M07_interpretability_score": 9.0,
     "M08_trust_accumulation_utility": null,
     "M09_false_alarm_rate_pct": 0.0,
     "M10_implementation_effort_loc": 157
   },
   {
     "pipeline": "dsig",
-    "M01_decision_latency_s": null,
-    "M02_signal_compactness_bytes": 833.6,
-    "M03_noise_reduction_ratio_pct": 11.94,
+    "M01_decision_latency_s": 4.754,
+    "M02_signal_compactness_bytes": 706.1,
+    "M03_noise_reduction_ratio_pct": 18.53,
     "M04_silence_resilience": {
       "detection_score": 100.0,
       "diagnostic_score": 100.0
     },
     "M05_convergence_diagnostic_pct": 75.0,
     "M06_diagnostic_precision_pct": 75.0,
-    "M07_interpretability_score": null,
+    "M07_interpretability_score": 5.0,
     "M08_trust_accumulation_utility": 0.0,
     "M09_false_alarm_rate_pct": 0.0,
-    "M10_implementation_effort_loc": 346
+    "M10_implementation_effort_loc": 338
   },
   {
     "pipeline": "otel_dsig",
-    "M01_decision_latency_s": null,
-    "M02_signal_compactness_bytes": 831.5,
-    "M03_noise_reduction_ratio_pct": 12.17,
+    "M01_decision_latency_s": 5.007,
+    "M02_signal_compactness_bytes": 703.9,
+    "M03_noise_reduction_ratio_pct": 18.78,
     "M04_silence_resilience": {
       "detection_score": 100.0,
       "diagnostic_score": 100.0
     },
     "M05_convergence_diagnostic_pct": 75.0,
     "M06_diagnostic_precision_pct": 75.0,
-    "M07_interpretability_score": null,
+    "M07_interpretability_score": 4.0,
     "M08_trust_accumulation_utility": 100.0,
     "M09_false_alarm_rate_pct": 0.0,
-    "M10_implementation_effort_loc": 139
+    "M10_implementation_effort_loc": 135
   }
 ]
