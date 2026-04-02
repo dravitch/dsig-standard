@@ -1,0 +1,162 @@
+[
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-S2-01",
+    "input_tokens": 126,
+    "output_tokens": 129,
+    "input_tokens_to_llm": 126,
+    "latency_s": 5.145,
+    "response": "**System Status & Recommended Action:**\nThe system is fully healthy with low latency, moderate and stable resource utilization, and zero errors \u2014 no action is required at this time.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally clear, providing well-labeled, specific metrics (percentile latency, CPU, memory, error rate) with units, a precise timestamp, and clear node/pipeline identification; the only minor limitation is the absence of defined thresholds or baselines, which would otherwise confirm whether these values are within expected ranges rather than relying on general inference.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-S2-01",
+    "input_tokens": 130,
+    "output_tokens": 117,
+    "input_tokens_to_llm": 130,
+    "latency_s": 4.007,
+    "response": "**System Status & Recommended Action:** The system is fully healthy with perfect data quality, zero errors, and 100% uptime, so no action is required beyond continued routine monitoring.\n\n**Clarity Rating: 9/10**\nAll key metrics are explicitly labeled with units, thresholds are implicitly clear through the NOMINAL status, and the data is concise and well-structured \u2014 losing one point only because no explicit baseline thresholds are provided for context (e.g., what latency or CPU level would trigger a warning).",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-S2-01",
+    "input_tokens": 141,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 141,
+    "latency_s": 4.286,
+    "response": "## System Status & Recommended Action\n\nThe system is in a **marginal/borderline state** despite a \"GOOD\" label \u2014 the low internet connectivity (25.0), poor DNS performance (15.0), and weak hub score (10.0) are dragging down an otherwise healthy local environment (vital=100, local=89.2), suggesting an **upstream or ISP-level issue**; recommended action is to **investigate external connectivity, check DNS resolver configuration, and verify hub/gateway health before escalating to the provider**.\n\n---\n\n## Clarity Rating: **4/10**\n\n**Reasons for low score:**\n- \u274c **\"GOOD\" label with YELLOW",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-S2-01",
+    "input_tokens": 146,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 146,
+    "latency_s": 5.126,
+    "response": "## System Status & Recommended Action\n\nThe system is operating in a borderline acceptable state with moderate CPU usage (43%) and elevated P99 latency (~12ms) but zero errors, so **no immediate action is required** though proactive monitoring and investigation of latency trends is recommended before conditions degrade.\n\n---\n\n## Clarity Rating: **6/10**\n\n**Reasons for deductions:**\n- \u26a0\ufe0f **Contradictory signals** \u2014 `label=GOOD` but `color=YELLOW` creates ambiguity; these should align\n- \u26a0\ufe0f **\"GOOD\" label feels misleading** given yellow status threshold \u2014 labeling conventions need",
+    "interpretability_rating": 6.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-S2-02",
+    "input_tokens": 126,
+    "output_tokens": 118,
+    "input_tokens_to_llm": 126,
+    "latency_s": 3.895,
+    "response": "**System Status & Recommended Action:**\nThe system is operating normally with low latency, moderate resource utilization, and zero errors \u2014 no action is required at this time.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally clear, providing well-labeled, quantified metrics across the key performance dimensions (latency, CPU, memory, errors) with full context (pipeline, node, timestamp); the only minor gap is the absence of defined thresholds or baselines, which would make it perfect for automated decision-making.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-S2-02",
+    "input_tokens": 130,
+    "output_tokens": 108,
+    "input_tokens_to_llm": 130,
+    "latency_s": 3.983,
+    "response": "**System Status & Recommended Action:**\nThe DataMesh Data Product pipeline on node-hub-01 is fully operational with perfect quality and zero errors, requiring no action at this time.\n\n**Clarity Rating: 9/10**\n\nAll key metrics are explicitly labeled, numerically precise, and unambiguous \u2014 minor deduction only because context around thresholds/baselines is absent, making it impossible to confirm whether latency or resource values are within *expected* ranges without external reference.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-S2-02",
+    "input_tokens": 142,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 142,
+    "latency_s": 5.42,
+    "response": "## System Status & Recommended Action\n\n**The system is in a degraded-but-stable state with adequate local performance but critically weak external connectivity (internet, DNS, and hub all scoring \u226425), and you should investigate the external network path and DNS infrastructure immediately before the stable trend deteriorates.**\n\n---\n\n## Clarity Rating: **4/10**\n\n**Reasons for low clarity:**\n\n- \u26a0\ufe0f **Contradictory signals** \u2014 `label=GOOD` with `color=YELLOW` are semantically inconsistent; \"GOOD\" implies acceptable, YELLOW implies caution\n- \u26a0\ufe0f **Score/color mismatch** \u2014 a score",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-S2-02",
+    "input_tokens": 147,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 147,
+    "latency_s": 5.505,
+    "response": "## System Status & Recommended Action\n\nThe system on node-oracle-01 is in a **marginal/borderline state** (score=60, YELLOW despite GOOD label) with stable but moderately elevated CPU (~42%) and acceptable latency/error metrics \u2014 **monitor closely but no immediate intervention required**.\n\n---\n\n## Clarity Rating: **4/10**\n\n### Reasons for Low Clarity:\n\n- **Label/color contradiction**: `label=GOOD` paired with `color=YELLOW` sends conflicting messages \u2014 these should align\n- **Score ambiguity**: A score of 60 is not clearly defined \u2014 is this out of 100? What are thresholds",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-S2-03",
+    "input_tokens": 126,
+    "output_tokens": 121,
+    "input_tokens_to_llm": 126,
+    "latency_s": 3.525,
+    "response": "**System Status & Recommended Action:**\nThe system is operating optimally with low latency, moderate resource utilization, and zero errors \u2014 no action is required at this time.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally well-structured, providing key performance metrics (latency percentiles, CPU, memory, error rate) with clear labels, precise values, units, timestamps, and node identification; the only minor gap is the absence of defined thresholds or baseline comparisons that would make the metrics immediately interpretable without domain knowledge.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-S2-03",
+    "input_tokens": 130,
+    "output_tokens": 105,
+    "input_tokens_to_llm": 130,
+    "latency_s": 3.878,
+    "response": "**System Status & Recommended Action:**\nThe system is fully healthy with perfect data quality, zero errors, and 100% uptime, so no action is required beyond routine monitoring.\n\n**Clarity Rating: 9/10**\nThe signal is exceptionally well-structured with clearly labeled metrics, a precise timestamp, and unambiguous values \u2014 losing one point only because \"NOMINAL\" and `quality=1.00` are slightly redundant without a defined threshold baseline for comparison.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-S2-03",
+    "input_tokens": 142,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 142,
+    "latency_s": 5.086,
+    "response": "## System Status & Recommended Action\n\nThe system is in a **degraded-but-stable state** with strong local performance but severely impaired external connectivity (internet, DNS, and hub scores all critically low), suggesting an upstream network or gateway issue \u2014 **investigate and restore external routing/DNS infrastructure immediately**.\n\n---\n\n## Clarity Rating: **4/10**\n\n**Reasons for low clarity:**\n\n- \u26a0\ufe0f **Contradictory signals** \u2014 `label=GOOD` and `color=YELLOW` conflict with critically low sub-scores (DNS=15, hub=15, internet=25)\n- \u26a0\ufe0f **\"GOOD\" label is misleading",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-S2-03",
+    "input_tokens": 147,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 147,
+    "latency_s": 5.406,
+    "response": "## System Status & Recommended Action\n\nThe system is operating within acceptable parameters but showing moderate CPU utilization (41.6%) and borderline P99 latency (~10ms) on node-oracle-01, warranting **passive monitoring** without immediate intervention.\n\n---\n\n## Clarity Rating: **4/10**\n\n### Reasons for Low Clarity:\n\n- **\"GOOD\" label paired with YELLOW color is contradictory** \u2014 these signals conflict and create ambiguity about actual health state\n- **Score of 60 is ambiguously positioned** \u2014 no defined threshold context (is 60/100? 60/1000?)\n- **\"D-SIG hybrid\"",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-S2-04",
+    "input_tokens": 126,
+    "output_tokens": 114,
+    "input_tokens_to_llm": 126,
+    "latency_s": 3.863,
+    "response": "**System Status & Recommended Action:**\nThe system is fully healthy with low latency, moderate resource utilization, and zero errors \u2014 no action is required at this time.\n\n**Clarity Rating: 9/10**\n\n*The signal is well-structured and highly readable, with clearly labeled metrics, a precise timestamp, and an identifiable node/pipeline context; it loses one point only because thresholds and baseline comparisons are absent, making it impossible to confirm \"healthy\" status purely from the signal itself without external reference.*",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-S2-04",
+    "input_tokens": 130,
+    "output_tokens": 101,
+    "input_tokens_to_llm": 130,
+    "latency_s": 4.529,
+    "response": "**System Status & Recommended Action:**\nThe system is fully operational with perfect data quality, zero errors, and healthy resource utilization \u2014 no action is required at this time.\n\n**Clarity Rating: 9/10**\n\nAll key metrics are present, well-labeled, and unambiguous; the minor deduction is because the signal lacks thresholds or baseline context that would make it self-contained for someone unfamiliar with the pipeline's normal operating ranges.",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-S2-04",
+    "input_tokens": 141,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 141,
+    "latency_s": 4.226,
+    "response": "## System Status & Recommended Action\n\nThe system is in a **marginal/borderline state** \u2014 local connectivity is strong but internet, DNS, and hub metrics are significantly degraded, suggesting an upstream or WAN-side issue; **investigate the internet gateway, DNS resolver, and hub connection immediately** while local services remain operational.\n\n---\n\n## Clarity Rating: **4/10**\n\n**Reasons for low score:**\n- \u26a0\ufe0f **Contradictory signals** \u2014 `label=GOOD` but `color=YELLOW` are mismatched; GOOD typically implies GREEN\n- \u26a0\ufe0f **Score vs. label mismatch** \u2014 a score of",
+    "interpretability_rating": 4.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-S2-04",
+    "input_tokens": 146,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 146,
+    "latency_s": 5.17,
+    "response": "## System Status & Recommended Action\n\nThe system is **nominally healthy** (GOOD label, 0% error rate, stable trend) but warrants **passive monitoring** due to the yellow color designation and borderline score of 60, suggesting metrics are acceptable but not optimal \u2014 no immediate action required, but investigate CPU usage at 43% and P99 latency to ensure they don't trend upward.\n\n---\n\n## Clarity Rating: **6/10**\n\n**Reasons for deductions:**\n\n- \u2753 **Score/color mismatch** \u2014 \"GOOD\" label with \"YELLOW\" color creates ambiguous interpretation\n- \u2753 **Score of 60 ",
+    "interpretability_rating": 6.0
+  }
+]
