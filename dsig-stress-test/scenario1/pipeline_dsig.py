@@ -200,19 +200,21 @@ def compute_dsig_signal(row: dict, prev_scores: list[int],
 
     if stale:
         # Rule 8: TTL exceeded → STALE signal
-        prev_label, prev_color = score_to_label_color(prev_scores[-1] if prev_scores else 50)
+        prev_label, _ = score_to_label_color(prev_scores[-1] if prev_scores else 50)
+        # COLOR REMOVED — interpretability fix: YELLOW≠GOOD in LLM/human convention
         return {
             "dsig_version":    "0.5",
             "score":           prev_scores[-1] if prev_scores else 50,
             "label":           prev_label,
-            "color":           prev_color,
             "trend":           "CRITICAL_FALL",   # silence is always CRITICAL_FALL
+            "score_context":   "score 0-100: EXCELLENT≥85, GOOD≥60, DEGRADED≥35, CRITICAL<35",
             "timestamp":       ts,
             "ttl":             TTL_SECONDS,
             "source_id":       node,
             "perspective":     persp,
             "baseline_cycles": baseline_cycles,
             "stale":           True,
+            "critical_dimensions": [],
             "dimensions":      {},
             "flags":           ["STALE"],
         }
@@ -245,20 +247,24 @@ def compute_dsig_signal(row: dict, prev_scores: list[int],
     }
     CRITICAL_THRESHOLD = 30
     CRITICAL_CAP       = 60
-    if any(v < CRITICAL_THRESHOLD for v in CRITICAL_DIMS_SCORES.values()):
+    critical_dims_active = [d for d, v in CRITICAL_DIMS_SCORES.items()
+                            if v < CRITICAL_THRESHOLD]
+    if critical_dims_active:
         score = min(score_raw, CRITICAL_CAP)
     else:
         score = score_raw
 
-    label, color = score_to_label_color(score)
+    label, _ = score_to_label_color(score)
+    # COLOR REMOVED — interpretability fix: YELLOW≠GOOD in LLM/human convention
     trend = compute_trend(prev_scores, score)
 
     return {
         "dsig_version":    "0.5",
         "score":           score,
         "label":           label,
-        "color":           color,
         "trend":           trend,
+        "score_context":   "score 0-100: EXCELLENT≥85, GOOD≥60, DEGRADED≥35, CRITICAL<35",
+        "critical_dimensions": critical_dims_active,
         "timestamp":       ts,
         "ttl":             TTL_SECONDS,
         "source_id":       node,
@@ -364,14 +370,18 @@ def run(df: pd.DataFrame) -> list[dict]:
                 signal_for_llm = (
                     f"Pipeline: D-SIG v0.5 | Node: {node_id} ({perspective}) | Time: {ts_str}\n"
                     f"[STALE — TTL exceeded] Last score={sig['score']} "
-                    f"label={sig['label']} color={sig['color']} trend={sig['trend']}"
+                    f"label={sig['label']} trend={sig['trend']}\n"
+                    f"{sig['score_context']}"
                 )
             else:
-                dims = sig.get("dimensions", {})
+                dims     = sig.get("dimensions", {})
+                crit_str = (f"  critical_dimensions={sig['critical_dimensions']}"
+                            if sig.get("critical_dimensions") else "")
                 signal_for_llm = (
                     f"Pipeline: D-SIG v0.5 | Node: {node_id} ({perspective}) | Time: {ts_str}\n"
-                    f"score={sig['score']} label={sig['label']} color={sig['color']} "
-                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']}\n"
+                    f"score={sig['score']} label={sig['label']} "
+                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']}{crit_str}\n"
+                    f"{sig['score_context']}\n"
                     f"vital={dims.get('vital',{}).get('score','?')}  "
                     f"local={dims.get('local',{}).get('score','?')}  "
                     f"internet={dims.get('internet',{}).get('score','?')}  "

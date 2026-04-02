@@ -25,9 +25,14 @@ import time
 
 import anthropic
 
+# PROMPT UPDATED — label/trend independence clarification for M07
 PROMPT_FIXED = (
     "Given this signal, what is the system status and recommended action "
-    "in one sentence? Rate the clarity of this signal from 1 to 10."
+    "in one sentence? Rate the clarity of this signal on a scale of 1 to 10. "
+    "Note: in this standard, 'label' indicates current state and 'trend' "
+    "indicates momentum — they are independent. A label of GOOD with trend "
+    "CRITICAL_FALL means the system is currently operational but deteriorating "
+    "rapidly. This is intentional, not a contradiction."
 )
 
 MODEL = "claude-sonnet-4-6"
@@ -111,7 +116,10 @@ def run_all_evaluations(
     client  = anthropic.Anthropic(api_key=api_key)
     results = []
 
-    sim_date = "2026-03-30"
+    # Derive sim_date from first available signal (supports multi-scenario reuse)
+    all_sigs = [s for sigs in pipeline_signals.values() for s in sigs]
+    sim_date = (pd.Timestamp(all_sigs[0]["timestamp"]).strftime("%Y-%m-%d")
+                if all_sigs else "2026-03-30")
 
     for inc in gt["incidents"]:
         inc_id  = inc["id"]

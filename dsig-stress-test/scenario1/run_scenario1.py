@@ -194,8 +194,16 @@ def _write_analysis_protocol():
 # ---------------------------------------------------------------------------
 
 def main():
-    force_synthetic = "--synthetic" in sys.argv
-    skip_llm        = "--skip-llm"  in sys.argv
+    force_synthetic = "--synthetic"   in sys.argv
+    skip_llm        = "--skip-llm"    in sys.argv
+
+    # --output-dir <path> overrides DSIG_RESULTS_DIR and the default
+    if "--output-dir" in sys.argv:
+        idx = sys.argv.index("--output-dir")
+        if idx + 1 < len(sys.argv):
+            global RESULTS_DIR, RAW_DIR
+            RESULTS_DIR = sys.argv[idx + 1]
+            RAW_DIR     = os.path.join(RESULTS_DIR, "raw_outputs")
 
     print("=" * 60)
     print("D-SIG Stress Test — Scenario 1: IT Node Vitality Monitoring")
