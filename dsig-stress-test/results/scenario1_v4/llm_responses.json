@@ -1,0 +1,162 @@
+[
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-01",
+    "input_tokens": 236,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 236,
+    "latency_s": 4.484,
+    "response": "## System Status & Recommended Action\n\nThe system is **fully healthy** \u2014 all metrics are nominal (low latency with minimal p50/p99 spread, moderate CPU and memory, zero errors) \u2014 and **no action is required** beyond routine monitoring.\n\n---\n\n## Signal Clarity Rating: **9 / 10**\n\n**Rationale:**\n- \u2705 Metrics are clean, complete, and internally consistent\n- \u2705 The p50/p99 latency spread (5.2ms \u2192 5.7ms) is unusually tight, indicating highly stable request patterns \u2014 easy to interpret\n- \u2705 No ambiguity in error rate or resource util",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-01",
+    "input_tokens": 240,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 240,
+    "latency_s": 3.351,
+    "response": "## System Status & Recommended Action\n\nThe DataMesh Data Product pipeline on node-hub-01 is fully healthy with perfect quality, zero errors, and comfortable resource headroom \u2014 no action required; continue routine monitoring.\n\n---\n\n## Signal Clarity Rating: **9/10**\n\n**Rationale:**\nAll metrics are unambiguous and self-consistent \u2014 `status=NOMINAL`, `quality=1.00`, `error_rate=0.0%`, and `uptime=100.0%` tell a single coherent story with no conflicting signals. CPU (42.56%) and memory (56.01%) are moderate and unremarkable. Latency p99 at",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-01",
+    "input_tokens": 324,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 324,
+    "latency_s": 5.28,
+    "response": "## System Status & Recommended Action\n\nThe system is **currently operational** (score 60/GOOD) but has **three critical dimensions** \u2014 internet (25), DNS (15), and hub (15) \u2014 indicating severe external connectivity and name-resolution failures that, if unaddressed, will likely degrade overall function; **immediately investigate upstream connectivity, DNS resolver health, and hub availability** while monitoring throughput (31.7, near-critical) for further decline.\n\n---\n\n## Signal Clarity Rating: **8 / 10**\n\n**Rationale:**\n- \u2705 The label/trend/score/threshold system is well-defined and internally consistent\n- \u2705 The",
+    "interpretability_rating": 8.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-01",
+    "input_tokens": 383,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 383,
+    "latency_s": 4.872,
+    "response": "## System Status & Recommended Action\n\n**Node node-oracle-01 is currently operational at the application layer (low latency, zero errors) but is experiencing critical network degradation in DNS (7.5), hub connectivity (15.0), and internet reachability (25.0), requiring immediate investigation of external network paths, DNS resolver health, and hub/gateway infrastructure before these conditions cascade into application-layer failures.**\n\n---\n\n## Signal Clarity Rating: **8 / 10**\n\n**Rationale:**\n\n| Factor | Assessment |\n|---|---|\n| Score/label/trend semantics | Well-defined; the cap-at-60 rule and label/trend independence are explicitly",
+    "interpretability_rating": 8.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-02",
+    "input_tokens": 236,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 236,
+    "latency_s": 5.311,
+    "response": "## System Status & Recommended Action\n\nThe system is **fully healthy** \u2014 all metrics are nominal (low latency, moderate CPU/memory, zero errors) \u2014 and no action is required beyond routine monitoring.\n\n---\n\n## Signal Clarity Rating: **9 / 10**\n\n**Rationale:**\nThe signal is exceptionally clean and unambiguous. All five metrics are well within normal ranges, there are no contradictory indicators, and the data is precisely timestamped with clear node identification. The only reason it falls short of a perfect 10 is the **absence of the dimensional score breakdown, trend indicators, label, and baseline_cycles** referenced in the standard \u2014 without those fields, a fully",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-02",
+    "input_tokens": 240,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 240,
+    "latency_s": 4.733,
+    "response": "## System Status & Recommended Action\n\nThe DataMesh Data Product pipeline on node-hub-01 is fully operational with perfect quality scores, zero errors, and healthy resource utilization \u2014 no action is required at this time beyond routine monitoring.\n\n---\n\n## Clarity Rating: **9/10**\n\n**Rationale:** The signal is exceptionally clean and unambiguous \u2014 all metrics are well within normal ranges, there are no contradictions between label and trend (status is NOMINAL with no degradation indicators), and every dimension is far above the critical threshold of 30. The only reason it doesn't score a 10 is the absence of trend/momentum data and baseline_cycles, which would provide fuller context",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-02",
+    "input_tokens": 323,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 323,
+    "latency_s": 5.129,
+    "response": "## System Status & Recommended Action\n\nThe system is **currently operational** (local/vital functions healthy) but has **critical external connectivity failures** \u2014 internet (25), DNS (15), and hub (15) are all well below the critical threshold \u2014 so you should **immediately investigate external network connectivity, starting with the hub/gateway, then DNS resolution, then upstream internet access**.\n\n---\n\n## Signal Clarity Rating: **9 / 10**\n\n**Reasoning:**\n- \u2705 The score, label, trend, and threshold definitions are explicit and unambiguous\n- \u2705 Critical dimensions are called out directly by name, not buried in raw numbers\n- \u2705 The vital/",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-02",
+    "input_tokens": 386,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 386,
+    "latency_s": 5.431,
+    "response": "## System Status & Recommended Action\n\nThe system is **currently operational but critically degraded** in network connectivity \u2014 internet (25), DNS (7.5), and hub (15) dimensions are all below the critical threshold, and with a 20% application error rate, **immediate investigation of external network dependencies, DNS resolution, and hub connectivity is required before service impact escalates.**\n\n---\n\n## Signal Clarity Rating: **8 / 10**\n\n**Why high:** The signal is well-structured and internally consistent. The score cap mechanic is clearly explained, the label/trend independence is documented, critical dimensions are explicitly flagged, and the two-layer data (OTel app + D-SIG network",
+    "interpretability_rating": 8.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-03",
+    "input_tokens": 236,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 236,
+    "latency_s": 5.008,
+    "response": "## System Status & Recommended Action\n\nThe system is **fully healthy** \u2014 all metrics are well within normal bounds (low latency, moderate CPU/memory, zero errors) \u2014 and no immediate action is required beyond routine monitoring.\n\n---\n\n## Signal Clarity Rating: **9 / 10**\n\n**Rationale:**\n- All five metrics are present, concrete, and unambiguous\n- Latency spread between p50 (4.8ms) and p99 (6.0ms) is unusually tight, which is actually a *positive* signal but worth noting as slightly atypical \u2014 worth a second look to confirm it's not a measurement artifact\n- No label, trend,",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-03",
+    "input_tokens": 240,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 240,
+    "latency_s": 4.921,
+    "response": "## System Status & Recommended Action\n\nThe DataMesh Data Product pipeline on node-hub-01 is fully healthy with perfect quality, zero errors, and comfortable resource headroom \u2014 no action required beyond routine monitoring.\n\n---\n\n## Clarity Rating: **9/10**\n\n**Rationale:** The signal is exceptionally clean and unambiguous \u2014 all metrics are concrete, quantified, and consistently positive with no contradictions or anomalies to interpret. The only reason it falls short of a perfect 10 is the absence of trend and dimension score data (including `baseline_cycles`), which would otherwise provide forward-looking confidence and momentum context. As presented, the signal is a reliable snapshot but lacks the",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-03",
+    "input_tokens": 325,
+    "output_tokens": 149,
+    "input_tokens_to_llm": 325,
+    "latency_s": 5.046,
+    "response": "## System Status & Recommended Action\n\nThe system is currently in a **DEGRADED and actively worsening state** with critical failures in internet connectivity, DNS resolution, and hub communication (all below 30), while local and vital functions remain intact \u2014 **immediately investigate the upstream network path, DNS servers, and hub/gateway device**, as this pattern is consistent with a WAN or gateway-level outage.\n\n---\n\n## Signal Clarity Rating: **8 / 10**\n\n**Rationale:**\n- \u2705 Score, label, trend, and dimension breakdown are all present and internally consistent\n- \u2705 The critical dimensions list directly maps to the low scores, making diagnosis straightforward",
+    "interpretability_rating": 8.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-03",
+    "input_tokens": 386,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 386,
+    "latency_s": 5.713,
+    "response": "## System Status & Recommended Action\n\nThe system is **currently operational at local/application level** (low latency, zero errors, healthy CPU) but is experiencing **critical network degradation** across internet connectivity (25), DNS resolution (7.5), and hub access (15) \u2014 investigate and restore external network path and DNS infrastructure immediately before application-layer impact occurs.\n\n---\n\n## Signal Clarity: **8 / 10**\n\n**Why high:** The signal is well-structured and internally consistent. The scoring cap logic, label/trend independence, and critical dimension flagging all work together coherently. The `baseline_cycles=169` adds meaningful confidence weighting. The OTel vs. D-",
+    "interpretability_rating": 8.0
+  },
+  {
+    "pipeline": "otel",
+    "incident_id": "INC-04",
+    "input_tokens": 236,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 236,
+    "latency_s": 5.372,
+    "response": "## System Status & Recommended Action\n\nThe system is **fully healthy** \u2014 all metrics are nominal (low latency, moderate CPU/memory, zero errors) \u2014 and **no action is required** beyond routine monitoring.\n\n---\n\n## Signal Clarity Rating: **9/10**\n\n**Rationale:**\n- Metrics are clean, complete, and unambiguous \u2014 latency is tight (p50/p99 spread of only 0.8ms suggests very stable distribution), CPU and memory are comfortably mid-range, and error rate is zero\n- The single point deducted reflects the **absence of dimensional scores, trend indicators, label, and baseline_cycles** \u2014 meaning this signal describes",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "datamesh",
+    "incident_id": "INC-04",
+    "input_tokens": 240,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 240,
+    "latency_s": 4.753,
+    "response": "## System Status & Recommended Action\n\nThe DataMesh Data Product pipeline on node-hub-01 is fully healthy \u2014 all metrics are nominal with perfect quality, zero errors, full uptime, and comfortable resource headroom \u2014 so no action is required beyond routine monitoring.\n\n---\n\n## Signal Clarity Rating: **9 / 10**\n\n**Rationale:**\nEvery key dimension is unambiguous and internally consistent. The `status=NOMINAL` label aligns cleanly with all underlying metrics (quality=1.00, error_rate=0%, uptime=100%, CPU/memory well within safe bands, low p99 latency). There is no label/trend tension to interpret, no",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "dsig",
+    "incident_id": "INC-04",
+    "input_tokens": 326,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 326,
+    "latency_s": 5.407,
+    "response": "## System Status & Recommended Action\n\nThe system is currently **degraded and actively worsening**, with internet connectivity, DNS resolution, and hub communication in a critical state (all scoring below 15/100), indicating a likely **upstream network or gateway failure** \u2014 immediately investigate the hub/gateway device, verify DNS resolver availability, and check the external internet uplink, as the node itself appears locally healthy (vital=100, local=50).\n\n---\n\n## Signal Clarity Rating: **9 / 10**\n\n**Rationale:**\n- \u2705 Score, label, and trend are all internally consistent and mutually reinforcing\n- \u2705 Critical dimensions are explicitly flagged *and*",
+    "interpretability_rating": 9.0
+  },
+  {
+    "pipeline": "otel_dsig",
+    "incident_id": "INC-04",
+    "input_tokens": 387,
+    "output_tokens": 150,
+    "input_tokens_to_llm": 387,
+    "latency_s": 6.161,
+    "response": "## System Status & Recommended Action\n\n**Node node-oracle-01 is currently labeled GOOD (score 60, stable trend) but has three critical network dimensions \u2014 internet (25), DNS (7.5), and hub (15) \u2014 indicating severe external connectivity degradation despite healthy app-layer metrics; immediately investigate upstream network infrastructure, DNS resolution, and hub connectivity before dependent services are impacted.**\n\n---\n\n## Signal Clarity Rating: **8 / 10**\n\n**Rationale:**\n\n| Factor | Assessment |\n|---|---|\n| Score + label + trend | Clear and consistent |\n| Critical dimension callout | Explicit and well-flagged |\n| Score cap rule (c",
+    "interpretability_rating": 8.0
+  }
+]

@@ -370,18 +370,22 @@ def run(df: pd.DataFrame) -> list[dict]:
                 signal_for_llm = (
                     f"Pipeline: D-SIG v0.5 | Node: {node_id} ({perspective}) | Time: {ts_str}\n"
                     f"[STALE — TTL exceeded] Last score={sig['score']} "
-                    f"label={sig['label']} trend={sig['trend']}\n"
+                    f"label={sig['label']} trend={sig['trend']} "
+                    f"baseline_cycles={sig['baseline_cycles']} (stable convergence cycles; higher=more trust)\n"
                     f"{sig['score_context']}"
                 )
             else:
                 dims     = sig.get("dimensions", {})
-                crit_str = (f"  critical_dimensions={sig['critical_dimensions']}"
-                            if sig.get("critical_dimensions") else "")
+                crit_str = (
+                    f"  critical_dimensions={sig['critical_dimensions']} (score<30 threshold)"
+                    if sig.get("critical_dimensions") else ""
+                )
                 signal_for_llm = (
                     f"Pipeline: D-SIG v0.5 | Node: {node_id} ({perspective}) | Time: {ts_str}\n"
                     f"score={sig['score']} label={sig['label']} "
-                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']}{crit_str}\n"
+                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']} (stable convergence cycles; higher=more trust){crit_str}\n"
                     f"{sig['score_context']}\n"
+                    f"dimensions (score 0-100, higher=better): "
                     f"vital={dims.get('vital',{}).get('score','?')}  "
                     f"local={dims.get('local',{}).get('score','?')}  "
                     f"internet={dims.get('internet',{}).get('score','?')}  "

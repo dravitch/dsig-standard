@@ -1,0 +1,5 @@
+pipeline,M01_decision_latency_s,M02_signal_compactness_bytes,M03_noise_reduction_ratio_pct,M04_silence_resilience.detection_score,M04_silence_resilience.diagnostic_score,M05_convergence_diagnostic_pct,M06_diagnostic_precision_pct,M07_interpretability_score,M08_trust_accumulation_utility,M09_false_alarm_rate_pct,M10_implementation_effort_loc
+otel,5.707,279.9,67.7,100.0,100.0,100.0,100.0,9.0,,0.0,133
+datamesh,5.558,553.4,36.15,100.0,100.0,100.0,100.0,9.0,,0.0,157
+dsig,4.968,828.0,4.47,100.0,100.0,75.0,75.0,8.8,0.0,0.0,350
+otel_dsig,5.096,825.6,4.73,100.0,100.0,75.0,75.0,8.0,0.0,0.0,149

@@ -117,22 +117,32 @@ def run(df: pd.DataFrame) -> list[dict]:
                     f"Pipeline: OTel→D-SIG hybrid | Node: {node_id} "
                     f"({otel_sig['perspective']}) | Time: {ts_str}\n"
                     f"[STALE — OTel source went silent] "
-                    f"Last score={sig['score']} label={sig['label']} trend={sig['trend']}\n"
+                    f"Last score={sig['score']} label={sig['label']} trend={sig['trend']} "
+                    f"baseline_cycles={sig['baseline_cycles']} (stable convergence cycles; higher=more trust)\n"
                     f"{sig.get('score_context', '')}"
                 )
             else:
                 dims     = sig.get("dimensions", {})
-                crit_str = (f"  critical_dimensions={sig['critical_dimensions']}"
-                            if sig.get("critical_dimensions") else "")
+                crit_str = (
+                    f"  critical_dimensions={sig['critical_dimensions']} (score<30 threshold)"
+                    if sig.get("critical_dimensions") else ""
+                )
                 signal_for_llm = (
                     f"Pipeline: OTel→D-SIG hybrid | Node: {node_id} "
                     f"({otel_sig['perspective']}) | Time: {ts_str}\n"
                     f"score={sig['score']} label={sig['label']} "
-                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']}{crit_str}\n"
-                    f"{sig.get('score_context', '')}\n"
-                    f"[OTel source: latency_p99={otel_sig['metrics'].get('latency_p99')}ms "
+                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']} (stable convergence cycles; higher=more trust){crit_str}\n"
+                    f"{sig.get('score_context', '')} — score capped at 60 when critical dimensions present\n"
+                    f"[OTel app-layer: latency_p99={otel_sig['metrics'].get('latency_p99')}ms "
                     f"cpu={otel_sig['metrics'].get('cpu_avg')}% "
-                    f"error_rate={otel_sig['metrics'].get('error_rate')}%]"
+                    f"error_rate={otel_sig['metrics'].get('error_rate')}%]\n"
+                    f"[D-SIG network-layer (score 0-100, higher=better): "
+                    f"vital={dims.get('vital',{}).get('score','?')}  "
+                    f"local={dims.get('local',{}).get('score','?')}  "
+                    f"internet={dims.get('internet',{}).get('score','?')}  "
+                    f"dns={dims.get('dns',{}).get('score','?')}  "
+                    f"throughput={dims.get('throughput',{}).get('score','?')}  "
+                    f"hub={dims.get('hub',{}).get('score','?')}]"
                 )
 
             dsig_bytes   = len(json.dumps(sig).encode("utf-8"))

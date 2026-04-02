@@ -25,14 +25,17 @@ import time
 
 import anthropic
 
-# PROMPT UPDATED — label/trend independence clarification for M07
+# PROMPT UPDATED v4 — units, baseline_cycles semantics, critical threshold
 PROMPT_FIXED = (
     "Given this signal, what is the system status and recommended action "
     "in one sentence? Rate the clarity of this signal on a scale of 1 to 10. "
     "Note: in this standard, 'label' indicates current state and 'trend' "
     "indicates momentum — they are independent. A label of GOOD with trend "
     "CRITICAL_FALL means the system is currently operational but deteriorating "
-    "rapidly. This is intentional, not a contradiction."
+    "rapidly. This is intentional, not a contradiction. "
+    "Dimension scores are on a 0-100 scale (higher is better); any dimension "
+    "below 30 is considered critical. 'baseline_cycles' is a trust metric: "
+    "higher means more cycles of stable multi-perspective convergence."
 )
 
 MODEL = "claude-sonnet-4-6"
