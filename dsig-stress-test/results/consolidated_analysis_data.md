@@ -1,8 +1,8 @@
-# Consolidated D-SIG Stress Test Results (v2 runs)
+# Consolidated D-SIG Stress Test Results (v2 + v3 runs)
 
-**Generated:** 2026-04-01  
-**Runs covered:** `scenario1_v2`, `scenario1_v2_corrected`, `scenario2_v2`  
-**Purpose:** Full data for DeepSeek analysis of M07 (interpretability) failure for D-SIG and OTel→D-SIG pipelines.
+**Generated:** 2026-04-01 — **Updated:** 2026-04-01 (v3 runs added)  
+**Runs covered:** `scenario1_v2`, `scenario1_v2_corrected`, `scenario2_v2` (color fix absent) + `scenario1_v3`, `scenario1_v3_corrected`, `scenario2_v3` (color fix applied)  
+**Purpose:** Full data for DeepSeek analysis of M07 (interpretability) evolution before/after color fix.
 
 ---
 
@@ -300,6 +300,77 @@ Phase E of INSTRUCTIONS_INTERP_FIX.md was not executed.
 
 ## 6. Required Actions before next analysis
 
-1. **Verify and apply the color fix** — check `scenario1/pipeline_dsig.py` and `scenario1/pipeline_otel_dsig.py` to confirm whether the fix is in the source code. If it is, the nix-shell may be running cached `.pyc` files. If it is not, apply the fix from INSTRUCTIONS_INTERP_FIX.md Phase A.
-2. **Rerun all three scenarios** with LLM after confirming `color` is absent from `signal_for_llm` in raw outputs.
-3. **Create ANALYSIS_PROTOCOL.md** in each v2 results directory (Phase E).
+~~1. Verify and apply the color fix~~ ✅ Done — PR #5 merged, fix confirmed.  
+~~2. Rerun all three scenarios~~ ✅ Done — see Section 7 below.  
+3. **Create ANALYSIS_PROTOCOL.md** in v3 result directories (Phase E still pending).
+
+---
+
+## 7. v3 Runs — Color Fix Applied (2026-04-01)
+
+### Signal structure confirmed (test result)
+
+```
+color present:              False  ✅
+score_context present:      True   ✅
+critical_dimensions present: True  ✅
+
+Example signal_for_llm (D-SIG, nominal node):
+Pipeline: D-SIG v0.5 | Node: node-local-01 (LOCAL) | Time: 2026-04-01T00:00:00+00:00
+score=19 label=CRITICAL trend=STABLE baseline_cycles=0  critical_dimensions=['internet', 'dns', 'hub']
+score 0-100: EXCELLENT≥85, GOOD≥60, DEGRADED≥35, CRITICAL<35
+vital=0  local=98.0  internet=25.0  dns=15.0  throughput=32.0  hub=15.0
+```
+
+### 7.1 Scenario 1 – Baseline v3 (scenario1_v3)
+
+| Pipeline   | M01 Latency (s) | M02 Compact (B) | M03 Noise Red (%) | M04 Det | M04 Diag | M05 (%) | M06 (%) | M07 Interp | M08 (%) | M09 FAR (%) | M10 LOC |
+|------------|-----------------|-----------------|-------------------|---------|----------|---------|---------|-----------|---------|------------|--------|
+| OTel       | 5.287           | 279.9           | 67.7              | 100.0   | 100.0    | 100.0   | 100.0   | **9.0**   | —       | 0.0        | 133    |
+| Data Mesh  | 5.296           | 553.4           | 36.15             | 100.0   | 100.0    | 100.0   | 100.0   | **9.0**   | —       | 0.0        | 157    |
+| D-SIG      | 4.903           | 828.0           | 4.47              | 100.0   | 100.0    | 75.0    | 75.0    | **6.8**   | 0.0     | 0.0        | 346    |
+| OTel→D-SIG | 5.027           | 825.6           | 4.73              | 100.0   | 100.0    | 75.0    | 75.0    | **6.5**   | 0.0     | 0.0        | 139    |
+
+*Note: M02 increased (828B vs 700B) and M03 dropped (4.5% vs 19%) because `score_context` + `critical_dimensions` were added to the signal — expected trade-off.*
+
+### 7.2 Scenario 1 – Corrected v3 (scenario1_v3_corrected)
+
+| Pipeline   | M01 Latency (s) | M02 Compact (B) | M03 Noise Red (%) | M04 Det | M04 Diag | M05 (%) | M06 (%) | M07 Interp | M08 (%) | M09 FAR (%) | M10 LOC |
+|------------|-----------------|-----------------|-------------------|---------|----------|---------|---------|-----------|---------|------------|--------|
+| OTel       | 4.972           | 279.9           | 67.7              | 100.0   | 100.0    | 100.0   | 100.0   | **9.0**   | —       | 0.0        | 133    |
+| Data Mesh  | 5.828           | 553.4           | 36.15             | 100.0   | 100.0    | 100.0   | 100.0   | **9.0**   | —       | 0.0        | 157    |
+| D-SIG      | 4.873           | 828.0           | 4.47              | 100.0   | 100.0    | 75.0    | 75.0    | **6.8**   | 0.0     | 0.0        | 346    |
+| OTel→D-SIG | 5.417           | 825.6           | 4.73              | 100.0   | 100.0    | 75.0    | 75.0    | **6.8**   | 0.0     | 0.0        | 139    |
+
+### 7.3 Scenario 2 – Network Stress v3 (scenario2_v3)
+
+| Pipeline   | M01 Latency (s) | M02 Compact (B) | M03 Noise Red (%) | M04 Det | M04 Diag | M05 (%) | M06 (%) | M07 Interp | M08 (%) | M09 FAR (%) | M10 LOC |
+|------------|-----------------|-----------------|-------------------|---------|----------|---------|---------|-----------|---------|------------|--------|
+| OTel       | 5.028           | 280.8           | 67.6              | 100.0   | 100.0    | 100.0   | 100.0   | **8.2**   | —       | 0.0        | 133    |
+| Data Mesh  | 5.377           | 555.4           | 35.92             | 100.0   | 100.0    | 100.0   | 100.0   | **9.0**   | —       | 0.0        | 157    |
+| D-SIG      | 5.012           | 833.6           | 3.81              | 100.0   | 100.0    | 75.0    | 75.0    | **6.5**   | 0.0     | 0.0        | 346    |
+| OTel→D-SIG | 4.895           | 831.5           | 4.06              | 100.0   | 100.0    | 75.0    | 75.0    | **7.0**   | 100.0   | 0.0        | 139    |
+
+### 7.4 M07 Evolution — v2 vs v3
+
+| Pipeline   | S1_v2 | **S1_v3** | Δ    | S1_corr_v2 | **S1_corr_v3** | Δ    | S2_v2 | **S2_v3** | Δ    |
+|------------|-------|-----------|------|------------|----------------|------|-------|-----------|------|
+| OTel       | 9.0   | 9.0       | 0    | 9.2        | 9.0            | -0.2 | 9.0   | 8.2       | -0.8 |
+| Data Mesh  | 9.0   | 9.0       | 0    | 9.0        | 9.0            | 0    | 9.0   | 9.0       | 0    |
+| D-SIG      | 6.0   | **6.8**   | +0.8 | 5.2        | **6.8**        | +1.6 | 5.0   | **6.5**   | +1.5 |
+| OTel→D-SIG | 5.0   | **6.5**   | +1.5 | 5.0        | **6.8**        | +1.8 | 4.0   | **7.0**   | +3.0 |
+
+**The color fix improved M07 for D-SIG by +0.8 to +1.6 points and for OTel→D-SIG by +1.5 to +3.0 points across all scenarios.**
+
+### 7.5 Remaining gap analysis
+
+Despite the improvement, D-SIG and OTel→D-SIG remain below OTel/Data Mesh (~9.0). Residual issues cited by the LLM in v2 runs that are likely still present:
+
+1. **Dimension score units ambiguous** — values like `internet=25.0`, `dns=15.0` have no unit label (ms? % ? out of 100?). The LLM infers but notes the ambiguity.
+2. **`baseline_cycles` unexplained** — large values (e.g. 169, 253) appear without context.
+3. **M05/M06 stuck at 75%** — D-SIG misidentifies 1 out of 4 incidents (convergence/precision). Structural issue unrelated to signal clarity.
+4. **`score_context` added** — this likely explains the improvement. Further gains may require labeling dimension scores explicitly (e.g. `internet=25/100`).
+
+### 7.6 M03 trade-off note
+
+M03 (Noise Reduction) dropped from ~19% to ~4.5% for D-SIG in v3. This is expected: `score_context` (a fixed 60-char legend string) and `critical_dimensions` add output bytes while input bytes remain constant, reducing the apparent compression ratio. This is a signal enrichment trade-off, not a regression.
