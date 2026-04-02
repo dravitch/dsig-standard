@@ -111,20 +111,25 @@ def run(df: pd.DataFrame) -> list[dict]:
             window_scores_shared[ts_str][node_id] = sig["score"]
 
             # Signal text for LLM
+            # COLOR REMOVED — interpretability fix: YELLOW≠GOOD in LLM/human convention
             if sig["stale"]:
                 signal_for_llm = (
                     f"Pipeline: OTel→D-SIG hybrid | Node: {node_id} "
                     f"({otel_sig['perspective']}) | Time: {ts_str}\n"
                     f"[STALE — OTel source went silent] "
-                    f"Last score={sig['score']} label={sig['label']} trend={sig['trend']}"
+                    f"Last score={sig['score']} label={sig['label']} trend={sig['trend']}\n"
+                    f"{sig.get('score_context', '')}"
                 )
             else:
-                dims = sig.get("dimensions", {})
+                dims     = sig.get("dimensions", {})
+                crit_str = (f"  critical_dimensions={sig['critical_dimensions']}"
+                            if sig.get("critical_dimensions") else "")
                 signal_for_llm = (
                     f"Pipeline: OTel→D-SIG hybrid | Node: {node_id} "
                     f"({otel_sig['perspective']}) | Time: {ts_str}\n"
-                    f"score={sig['score']} label={sig['label']} color={sig['color']} "
-                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']}\n"
+                    f"score={sig['score']} label={sig['label']} "
+                    f"trend={sig['trend']} baseline_cycles={sig['baseline_cycles']}{crit_str}\n"
+                    f"{sig.get('score_context', '')}\n"
                     f"[OTel source: latency_p99={otel_sig['metrics'].get('latency_p99')}ms "
                     f"cpu={otel_sig['metrics'].get('cpu_avg')}% "
                     f"error_rate={otel_sig['metrics'].get('error_rate')}%]"
